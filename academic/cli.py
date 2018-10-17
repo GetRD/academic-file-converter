@@ -104,15 +104,21 @@ def parse_bibtex_entry(entry, featured=False):
     # Prepare TOML front matter for Markdown file.
     frontmatter = ['+++']
     frontmatter.append('title = "{}"'.format(clean_bibtex_str(entry['title'])))
-    frontmatter.append('date = {}-{}-01'.format(entry['year'], month2number(entry['month'])))
+    if 'month' in entry:
+        frontmatter.append('date = {}-{}-01'.format(entry['year'], month2number(entry['month'])))
+    else:
+        frontmatter.append('date = {}-01-01'.format(entry['year']))
 
-    authors = []
-    for author in entry['author']:
-        authors.append('"{}"'.format(clean_bibtex_str(author)))
+    authors = clean_bibtex_authors([i.strip() for i in entry['author'].replace('\n', ' ').split(' and ')])
     frontmatter.append('authors = [{}]'.format(', '.join(authors)))
 
     frontmatter.append('publication_types = ["0"]')  # TODO: map pub. types
-    frontmatter.append('abstract = "{}"'.format(clean_bibtex_str(entry['abstract'])))
+
+    if 'abstract' in entry:
+        frontmatter.append('abstract = "{}"'.format(clean_bibtex_str(entry['abstract'])))
+    else:
+        frontmatter.append('abstract = ""')
+
     frontmatter.append('selected = "{}"'.format(str(featured).lower()))
 
     # Publication name.
@@ -120,6 +126,8 @@ def parse_bibtex_entry(entry, featured=False):
         frontmatter.append('publication = "*{}*"'.format(clean_bibtex_str(entry['booktitle'])))
     elif 'journal' in entry:
         frontmatter.append('publication = "*{}*"'.format(clean_bibtex_str(entry['journal'])))
+    else:
+        frontmatter.append('publication = ""')
 
     if 'link' in entry:
         frontmatter.append('url_pdf = "{}"'.format(clean_bibtex_str(entry['link'])))
@@ -127,7 +135,7 @@ def parse_bibtex_entry(entry, featured=False):
     if 'doi' in entry:
         frontmatter.append('doi = "{}"'.format(entry['doi']))
 
-    frontmatter.append('+++')
+    frontmatter.append('+++\n\n')
 
     # Add line breaks.
     # frontmatter = [s + '\n' for s in frontmatter]
@@ -139,6 +147,30 @@ def parse_bibtex_entry(entry, featured=False):
             f.write("\n".join(frontmatter))
     except IOError:
         print('ERROR: could not save file.')
+
+
+def clean_bibtex_authors(author_str):
+    """Convert author names to `firstname(s) lastname` format."""
+    authors = []
+    for s in author_str:
+        s = s.strip()
+        if len(s) < 1:
+            continue
+        if ',' in s:
+            split_names = s.split(',', 1)
+            last_name = split_names[0].strip()
+            first_names = [i.strip() for i in split_names[1].split()]
+        else:
+            split_names = s.split()
+            last_name = split_names.pop()
+            first_names = [i.replace('.', '. ').strip() for i in split_names]
+        if last_name in ['jnr', 'jr', 'junior']:
+            last_name = first_names.pop()
+        for item in first_names:
+            if item in ['ben', 'van', 'der', 'de', 'la', 'le']:
+                last_name = first_names.pop() + ' ' + last_name
+        authors.append('"{} {}"'.format(' '.join(first_names), last_name))
+    return authors
 
 
 def clean_bibtex_str(s):
