@@ -1,0 +1,9 @@
+*.pyc
+.DS_Store
+*.egg-info/
+build/
+dist/
+site/
+.idea/
+.tox/
+.cache/
