@@ -54,6 +54,7 @@ def main():
     parser_a.add_argument("--publication-dir", required=False, type=str, default='publication',
                           help='Directory that your publications are stored in (default `publication`)')
     parser_a.add_argument("--featured", action='store_true', help='Flag these publications as featured?')
+    parser_a.add_argument("--overwrite", action='store_false', help='Overwrite existing publications?')
 
     args, unknown = parser.parse_known_args()
 
@@ -72,10 +73,10 @@ def main():
     elif args.command and args.assets:
         import_assets()
     elif args.command and args.bibtex:
-        import_bibtex(args.bibtex, args.publication_dir, args.featured)
+        import_bibtex(args.bibtex, pub_dir=args.publication_dir, featured=args.featured, overwrite=args.overwrite)
 
 
-def import_bibtex(bibtex, pub_dir='publication', featured=False):
+def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False):
     """Import publications from BibTeX file"""
 
     # Check BibTeX file exists.
@@ -89,10 +90,10 @@ def import_bibtex(bibtex, pub_dir='publication', featured=False):
         parser.customization = convert_to_unicode
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
-            parse_bibtex_entry(entry, pub_dir, featured)
+            parse_bibtex_entry(entry,  pub_dir=pub_dir, featured=featured, overwrite=overwrite)
 
 
-def parse_bibtex_entry(entry, pub_dir='publication', featured=False):
+def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=False):
     """Parse a bibtex entry and generate corresponding publication bundle"""
     print('Parsing entry {}'.format(entry['ID']))
 
@@ -101,7 +102,7 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False):
     cite_path = os.path.join(bundle_path, '{}.bib'.format(entry['ID']))
 
     # Do not overwrite publication bundle if it already exists.
-    if os.path.isdir(bundle_path):
+    if not overwrite and os.path.isdir(bundle_path):
         pass
 
     # Create bundle dir.
