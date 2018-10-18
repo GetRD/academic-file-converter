@@ -19,9 +19,24 @@ from bibtexparser.bwriter import BibTexWriter
 from bibtexparser.bibdatabase import BibDatabase
 from bibtexparser.customization import convert_to_unicode
 
-ENCODING = 'utf8'
 JS_FILENAME = 'static/js/vendor/main.min.js'
 CSS_FILENAME = 'static/css/vendor/main.min.css'
+
+# Map BibTeX to Academic publication types.
+PUB_TYPES = {
+    'article': 2,
+    'book': 5,
+    'inbook': 6,
+    'incollection': 6,
+    'inproceedings': 1,
+    'manual': 4,
+    'mastersthesis': 4,
+    'misc': 0,
+    'phdthesis': 4,
+    'proceedings': 0,
+    'techreport': 4,
+    'unpublished': 3
+}
 
 
 def main():
@@ -57,10 +72,10 @@ def main():
     elif args.command and args.assets:
         import_assets()
     elif args.command and args.bibtex:
-        import_bibtex(args.bibtex, args.featured)
+        import_bibtex(args.bibtex, args.publication_dir, args.featured)
 
 
-def import_bibtex(bibtex, featured=False):
+def import_bibtex(bibtex, pub_dir='publication', featured=False):
     """Import publications from BibTeX file"""
 
     # Check BibTeX file exists.
@@ -74,14 +89,14 @@ def import_bibtex(bibtex, featured=False):
         parser.customization = convert_to_unicode
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
-            parse_bibtex_entry(entry, featured)
+            parse_bibtex_entry(entry, pub_dir, featured)
 
 
-def parse_bibtex_entry(entry, featured=False):
+def parse_bibtex_entry(entry, pub_dir='publication', featured=False):
     """Parse a bibtex entry and generate corresponding publication bundle"""
     print('Parsing entry {}'.format(entry['ID']))
 
-    bundle_path = 'content/publication/{}'.format(entry['ID'])
+    bundle_path = 'content/{}/{}'.format(pub_dir, entry['ID'])
     markdown_path = os.path.join(bundle_path, 'index.md')
     cite_path = os.path.join(bundle_path, '{}.bib'.format(entry['ID']))
 
@@ -112,7 +127,7 @@ def parse_bibtex_entry(entry, featured=False):
     authors = clean_bibtex_authors([i.strip() for i in entry['author'].replace('\n', ' ').split(' and ')])
     frontmatter.append('authors = [{}]'.format(', '.join(authors)))
 
-    frontmatter.append('publication_types = ["0"]')  # TODO: map pub. types
+    frontmatter.append('publication_types = ["{}"]'.format(PUB_TYPES.get(entry['ENTRYTYPE'], 0)))
 
     if 'abstract' in entry:
         frontmatter.append('abstract = "{}"'.format(clean_bibtex_str(entry['abstract'])))
@@ -129,20 +144,17 @@ def parse_bibtex_entry(entry, featured=False):
     else:
         frontmatter.append('publication = ""')
 
-    if 'link' in entry:
-        frontmatter.append('url_pdf = "{}"'.format(clean_bibtex_str(entry['link'])))
+    if 'url' in entry:
+        frontmatter.append('url_pdf = "{}"'.format(clean_bibtex_str(entry['url'])))
 
     if 'doi' in entry:
         frontmatter.append('doi = "{}"'.format(entry['doi']))
 
     frontmatter.append('+++\n\n')
 
-    # Add line breaks.
-    # frontmatter = [s + '\n' for s in frontmatter]
-
     # Save Markdown file.
     try:
-        print("Saving '{}'".format(markdown_path))
+        print("Saving Markdown to '{}'".format(markdown_path))
         with open(markdown_path, 'w', encoding='utf8') as f:
             f.write("\n".join(frontmatter))
     except IOError:
@@ -273,9 +285,9 @@ def download_file(url, file_name):
 
 def merge_files(file_path_list, destination):
     """Merge multiple files into one file"""
-    with open(destination, 'w', encoding=ENCODING) as f:
+    with open(destination, 'w', encoding='utf8') as f:
         for file_path in file_path_list:
-            with open(file_path, 'r', encoding=ENCODING) as source_file:
+            with open(file_path, 'r', encoding='utf8') as source_file:
                 f.write(source_file.read())
 
 
