@@ -144,6 +144,9 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False):
     else:
         frontmatter.append('publication = ""')
 
+    if 'keywords' in entry:
+        frontmatter.append('tags = [{}]'.format(clean_bibtex_tags(entry['keywords'])))
+
     if 'url' in entry:
         frontmatter.append('url_pdf = "{}"'.format(clean_bibtex_str(entry['url'])))
 
@@ -186,10 +189,19 @@ def clean_bibtex_authors(author_str):
 
 
 def clean_bibtex_str(s):
+    """Clean BibTeX string and escape TOML special characters"""
     s = s.replace('\\', '')
     s = s.replace('"', '\\"')
     s = s.replace("{", "").replace("}", "")
     return s
+
+
+def clean_bibtex_tags(s):
+    """Clean BibTeX keywords and convert to TOML tags"""
+    tags = clean_bibtex_str(s).split(',')
+    tags = ['"{}"'.format(tag.strip()) for tag in tags]
+    tags_str = ', '.join(tags)
+    return tags_str
 
 
 def month2number(month):
