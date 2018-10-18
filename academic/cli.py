@@ -182,7 +182,7 @@ def clean_bibtex_str(s):
 
 def month2number(month):
     """Convert BibTeX month to numeric"""
-    month_abbr = month.strip()[:3].lower()
+    month_abbr = month.strip()[:3].title()
     try:
         return str(list(calendar.month_abbr).index(month_abbr)).zfill(2)
     except ValueError:
