@@ -194,6 +194,8 @@ def clean_bibtex_str(s):
     s = s.replace('\\', '')
     s = s.replace('"', '\\"')
     s = s.replace("{", "").replace("}", "")
+    if s.find('\n') > -1:
+        s = '""{}""'.format(s)
     return s
 
 
