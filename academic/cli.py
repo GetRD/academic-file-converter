@@ -193,7 +193,8 @@ def clean_bibtex_str(s):
     """Clean BibTeX string and escape TOML special characters"""
     s = s.replace('\\', '')
     s = s.replace('"', '\\"')
-    s = s.replace("{", "").replace("}", "")
+    s = s.replace('{', '').replace('}', '')
+    s = s.replace('\t',' ').replace('\n','').replace('\r','')
     return s
 
 
