@@ -53,8 +53,8 @@ def main():
     parser_a.add_argument("--bibtex", required=False, type=str, help='File path to your BibTeX file')
     parser_a.add_argument("--publication-dir", required=False, type=str, default='publication',
                           help='Directory that your publications are stored in (default `publication`)')
-    parser_a.add_argument("--featured", action='store_true', help='Flag these publications as featured?')
-    parser_a.add_argument("--overwrite", action='store_false', help='Overwrite existing publications?')
+    parser_a.add_argument("--featured", action='store_true', help='Flag publications as featured')
+    parser_a.add_argument("--overwrite", action='store_true', help='Overwrite existing publications')
 
     args, unknown = parser.parse_known_args()
 
@@ -103,11 +103,12 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
 
     # Do not overwrite publication bundle if it already exists.
     if not overwrite and os.path.isdir(bundle_path):
-        pass
+        print('Skipping creation of {} as it already exists. To overwrite, add the `--overwrite` argument.'.format(bundle_path))
+        return
 
     # Create bundle dir.
     print('Creating folder {}'.format(bundle_path))
-    Path(bundle_path).mkdir(parents=True)
+    Path(bundle_path).mkdir(parents=True, exist_ok=True)
 
     # Save citation file.
     print('Saving citation to {}'.format(cite_path))
@@ -224,14 +225,15 @@ def import_assets():
         print('Please navigate to your website directory (where config.toml resides) and re-run.')
         return
 
-    # TODO: check compatible with user's academic version (v3+ may be required due to sensitivity of asset list order)
+    # Check compatibility with user's Academic version (v2.4.0+ required for local asset bundling)
+    # `academic.toml` was added in Academic v2.4.0, so can simply check for the existence of that file.
     academic_filename = 'themes/academic/data/academic.toml'
     if not Path(academic_filename).is_file():
         print('Could not detect Academic version. You may need to update Academic in order to use this tool.')
         return
 
     # Check assets file exists
-    # TODO: Order matters!
+    # Note that the order of assets in `assets.toml` matters since they will be concatenated in the order they appear.
     assets_filename = 'themes/academic/data/assets.toml'
     if not Path(assets_filename).is_file():
         print('Could not detect assets file. You may need to update Academic in order to use this tool.')
