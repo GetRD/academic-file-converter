@@ -95,11 +95,12 @@ def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False
 
 def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=False):
     """Parse a bibtex entry and generate corresponding publication bundle"""
-    print('Parsing entry {}'.format(entry['ID']))
+    cite_name = '{}.bib'.format(entry['ID'].replace('/','_').replace(":","_"))
+    print('Parsing entry {}'.format(cite_name))
 
-    bundle_path = 'content/{}/{}'.format(pub_dir, entry['ID'])
+    bundle_path = 'content/{}/{}'.format(pub_dir, cite_name)
     markdown_path = os.path.join(bundle_path, 'index.md')
-    cite_path = os.path.join(bundle_path, '{}.bib'.format(entry['ID']))
+    cite_path = os.path.join(bundle_path, cite_name)
 
     # Do not overwrite publication bundle if it already exists.
     if not overwrite and os.path.isdir(bundle_path):
@@ -107,7 +108,8 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
 
     # Create bundle dir.
     print('Creating folder {}'.format(bundle_path))
-    Path(bundle_path).mkdir(parents=True)
+    if not(os.path.exists(Path(bundle_path))):
+        Path(bundle_path).mkdir(parents=True)
 
     # Save citation file.
     print('Saving citation to {}'.format(cite_path))
@@ -125,7 +127,13 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     else:
         frontmatter.append('date = {}-01-01'.format(entry['year']))
 
-    authors = clean_bibtex_authors([i.strip() for i in entry['author'].replace('\n', ' ').split(' and ')])
+    if 'author' in entry:
+        authors = clean_bibtex_authors([i.strip() for i in entry['author'].replace('\n', ' ').split(' and ')])
+    else:
+        if 'editor' in entry:
+            authors = clean_bibtex_authors([i.strip() for i in entry['editor'].replace('\n', ' ').split(' and ')])
+        else:
+            authors = ""
     frontmatter.append('authors = [{}]'.format(', '.join(authors)))
 
     frontmatter.append('publication_types = ["{}"]'.format(PUB_TYPES.get(entry['ENTRYTYPE'], 0)))
@@ -194,7 +202,7 @@ def clean_bibtex_str(s):
     s = s.replace('\\', '')
     s = s.replace('"', '\\"')
     s = s.replace('{', '').replace('}', '')
-    s = s.replace('\t',' ').replace('\n','').replace('\r','')
+    s = s.replace('\t',' ').replace('\n',' ').replace('\r',' ')
     return s
 
 
