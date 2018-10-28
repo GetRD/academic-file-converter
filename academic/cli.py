@@ -19,6 +19,15 @@ from bibtexparser.bwriter import BibTexWriter
 from bibtexparser.bibdatabase import BibDatabase
 from bibtexparser.customization import convert_to_unicode
 
+import logging
+
+logger = logging.getLogger(__name__)
+ch = logging.StreamHandler(sys.stdout)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
+
 JS_FILENAME = 'static/js/vendor/main.min.js'
 CSS_FILENAME = 'static/css/vendor/main.min.css'
 
@@ -60,6 +69,7 @@ def main():
 
     # If no arguments, show help.
     if len(sys.argv[1:]) == 0:
+        logger.debug("no argments give, please read help for more information")
         parser.print_help()
         parser.exit()
 
