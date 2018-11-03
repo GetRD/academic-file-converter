@@ -280,7 +280,7 @@ def import_assets():
             print('Downloading {} from {}...'.format(filename, url))
             download_file(url, filepath)
 
-        print('Merging CSS assets into {}'.format(JS_FILENAME))
+        print('Merging CSS assets into {}'.format(CSS_FILENAME))
         merge_files(css_files, CSS_FILENAME)
 
 
