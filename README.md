@@ -45,10 +45,6 @@ Optional arguments:
 
 After importing publications, [a full text PDF and image can be associated with each item and further details added via extra parameters](https://sourcethemes.com/academic/docs/managing-content/#manually).
 
-**Import featured (selected) publications:**
-
-    academic import --bibtex my_featured_publications.bib 
-
 **Import third-party JS and CSS assets for building an offline website:**
 
     academic import --assets
