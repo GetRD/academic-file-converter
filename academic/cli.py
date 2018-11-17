@@ -97,9 +97,9 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     """Parse a bibtex entry and generate corresponding publication bundle"""
     print('Parsing entry {}'.format(entry['ID']))
 
-    bundle_path = 'content/{}/{}'.format(pub_dir, entry['ID'])
+    bundle_path = 'content/{}/{}'.format(pub_dir, slugify(entry['ID']))
     markdown_path = os.path.join(bundle_path, 'index.md')
-    cite_path = os.path.join(bundle_path, '{}.bib'.format(entry['ID']))
+    cite_path = os.path.join(bundle_path, '{}.bib'.format(slugify(entry['ID'])))
 
     # Do not overwrite publication bundle if it already exists.
     if not overwrite and os.path.isdir(bundle_path):
@@ -164,6 +164,15 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
             f.write("\n".join(frontmatter))
     except IOError:
         print('ERROR: could not save file.')
+
+
+def slugify(filename):
+    replace = ('.','_',':')
+    for r in replace:
+        filename = filename.replace(r, '-')
+
+    keep = ('-')
+    return "".join(c.replace('') for c in filename if c.isalnum() or c in keep).rstrip()
 
 
 def clean_bibtex_authors(author_str):
