@@ -3,6 +3,7 @@
 import subprocess
 import sys
 import os
+import re
 import argparse
 from argparse import RawTextHelpFormatter
 from pathlib import Path
@@ -85,7 +86,7 @@ def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False
         return
 
     # Load BibTeX file for parsing.
-    with open(bibtex, mode='rb', encoding='utf-8') as bibtex_file:
+    with open(bibtex, 'r', encoding='utf-8') as bibtex_file:
         parser = BibTexParser()
         parser.customization = convert_to_unicode
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
@@ -115,7 +116,7 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     db = BibDatabase()
     db.entries = [entry]
     writer = BibTexWriter()
-    with open(cite_path, 'w', encoding='utf8') as f:
+    with open(cite_path, 'w', encoding='utf-8') as f:
         f.write(writer.write(db))
 
     # Prepare TOML front matter for Markdown file.
@@ -160,19 +161,28 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     # Save Markdown file.
     try:
         print("Saving Markdown to '{}'".format(markdown_path))
-        with open(markdown_path, 'w', encoding='utf8') as f:
+        with open(markdown_path, 'w', encoding='utf-8') as f:
             f.write("\n".join(frontmatter))
     except IOError:
         print('ERROR: could not save file.')
 
 
-def slugify(filename):
-    replace = ('.','_',':')
-    for r in replace:
-        filename = filename.replace(r, '-')
+def slugify(s, lower=True):
+    bad_symbols = ('.','_',':')  # Symbols to replace with hyphen delimiter.
+    delimiter = '-'
+    good_symbols = (delimiter)  # Symbols to keep.
+    for r in bad_symbols:
+        s = s.replace(r, delimiter)
 
-    keep = ('-')
-    return "".join(c.replace('') for c in filename if c.isalnum() or c in keep).rstrip()
+    s = re.sub(r'(\D+)(\d+)', r'\1\-\2', s)  # Delimit non-number, number.
+    s = re.sub(r'(\d+)(\D+)', r'\1\-\2', s)  # Delimit number, non-number.
+    s = re.sub(r'((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))', r'\-\1', s)  # Delimit camelcase.
+    s = ''.join(c for c in s if c.isalnum() or c in good_symbols).strip()  # Strip non-alphanumeric and non-hyphen.
+    s = re.sub('\-+', '-', s)  # Remove consecutive hyphens.
+
+    if lower:
+        s = s.lower()
+    return s
 
 
 def clean_bibtex_authors(author_str):
@@ -310,9 +320,9 @@ def download_file(url, file_name):
 
 def merge_files(file_path_list, destination):
     """Merge multiple files into one file"""
-    with open(destination, 'w', encoding='utf8') as f:
+    with open(destination, 'w', encoding='utf-8') as f:
         for file_path in file_path_list:
-            with open(file_path, 'r', encoding='utf8') as source_file:
+            with open(file_path, 'r', encoding='utf-8') as source_file:
                 f.write(source_file.read())
 
 
