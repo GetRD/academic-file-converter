@@ -259,8 +259,8 @@ def import_assets():
         return
 
     # Create output dirs if necessary
-    Path(JS_FILENAME).mkdir(parents=True, exist_ok=True)
-    Path(CSS_FILENAME).mkdir(parents=True, exist_ok=True)
+    Path(JS_FILENAME).parent.mkdir(parents=True, exist_ok=True)
+    Path(CSS_FILENAME).parent.mkdir(parents=True, exist_ok=True)
 
     # Parse TOML file which lists assets
     parsed_toml = toml.load(assets_filename)
