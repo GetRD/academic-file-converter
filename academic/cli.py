@@ -137,7 +137,7 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     else:
         frontmatter.append('abstract = ""')
 
-    frontmatter.append('selected = "{}"'.format(str(featured).lower()))
+    frontmatter.append('selected = {}'.format(str(featured).lower()))
 
     # Publication name.
     if 'booktitle' in entry:
