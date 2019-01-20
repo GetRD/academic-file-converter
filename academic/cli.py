@@ -141,7 +141,7 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     else:
         frontmatter.append('abstract = ""')
 
-    frontmatter.append('selected = {}'.format(str(featured).lower()))
+    frontmatter.append('featured = {}'.format(str(featured).lower()))
 
     # Publication name.
     if 'booktitle' in entry:
@@ -243,16 +243,15 @@ def import_assets():
     """Download and import third-party JS and CSS assets to enable offline sites"""
 
     # Check that we are in an Academic website folder.
-    config_filename = 'config.toml'
-    if not Path(config_filename).is_file():
-        print('Please navigate to your website directory (where config.toml resides) and re-run.')
+    if not Path('content').is_folder():
+        print('Please navigate to your website folder and re-run.')
         return
 
     # Check compatibility with user's Academic version (v2.4.0+ required for local asset bundling)
     # `academic.toml` was added in Academic v2.4.0, so can simply check for the existence of that file.
     academic_filename = 'themes/academic/data/academic.toml'
     if not Path(academic_filename).is_file():
-        print('Could not detect Academic version. You may need to update Academic in order to use this tool.')
+        print('Could not detect Academic version in `themes/academic/data/academic.toml`. You may need to update Academic in order to use this tool.')
         return
 
     # Check assets file exists
