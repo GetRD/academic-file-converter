@@ -127,8 +127,12 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     else:
         frontmatter.append('date = {}-01-01'.format(entry['year']))
 
-    authors = clean_bibtex_authors([i.strip() for i in entry['author'].replace('\n', ' ').split(' and ')])
-    frontmatter.append('authors = [{}]'.format(', '.join(authors)))
+    if 'author' in entry:
+        authors = clean_bibtex_authors([i.strip() for i in entry['author'].replace('\n', ' ').split(' and ')])
+        frontmatter.append('authors = [{}]'.format(', '.join(authors)))
+    elif 'editor' in entry:
+        authors = clean_bibtex_authors([i.strip() for i in entry['editor'].replace('\n', ' ').split(' and ')])
+        frontmatter.append('authors = [{}]'.format(', '.join(authors)))
 
     frontmatter.append('publication_types = ["{}"]'.format(PUB_TYPES.get(entry['ENTRYTYPE'], 0)))
 
