@@ -243,7 +243,7 @@ def import_assets():
     """Download and import third-party JS and CSS assets to enable offline sites"""
 
     # Check that we are in an Academic website folder.
-    if not Path('content').is_folder():
+    if not Path('content').is_dir():
         print('Please navigate to your website folder and re-run.')
         return
 
