@@ -43,7 +43,7 @@ PUB_TYPES = {
 def main():
     """Parse command-line arguments"""
     parser = argparse.ArgumentParser(
-        description='Academic Admin Tool v{}\nhttps://sourcethemes.com/academic/'.format(version),
+        description=f'Academic Admin Tool v{version}\nhttps://sourcethemes.com/academic/',
         formatter_class=RawTextHelpFormatter)
     subparsers = parser.add_subparsers(help='Sub-commands', dest="command")
 
@@ -91,28 +91,28 @@ def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False
         parser.customization = convert_to_unicode
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
-            parse_bibtex_entry(entry,  pub_dir=pub_dir, featured=featured, overwrite=overwrite)
+            parse_bibtex_entry(entry, pub_dir=pub_dir, featured=featured, overwrite=overwrite)
 
 
 def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=False):
     """Parse a bibtex entry and generate corresponding publication bundle"""
-    print('Parsing entry {}'.format(entry['ID']))
+    print(f"Parsing entry {entry['ID']}")
 
-    bundle_path = 'content/{}/{}'.format(pub_dir, slugify(entry['ID']))
+    bundle_path = f"content/{pub_dir}/{slugify(entry['ID'])}"
     markdown_path = os.path.join(bundle_path, 'index.md')
-    cite_path = os.path.join(bundle_path, '{}.bib'.format(slugify(entry['ID'])))
+    cite_path = os.path.join(bundle_path, "{slugify(entry['ID'])}.bib")
 
     # Do not overwrite publication bundle if it already exists.
     if not overwrite and os.path.isdir(bundle_path):
-        print('Skipping creation of {} as it already exists. To overwrite, add the `--overwrite` argument.'.format(bundle_path))
+        print(f'Skipping creation of {bundle_path} as it already exists. To overwrite, add the `--overwrite` argument.')
         return
 
     # Create bundle dir.
-    print('Creating folder {}'.format(bundle_path))
+    print(f'Creating folder {bundle_path}')
     Path(bundle_path).mkdir(parents=True, exist_ok=True)
 
     # Save citation file.
-    print('Saving citation to {}'.format(cite_path))
+    print(f'Saving citation to {cite_path}')
     db = BibDatabase()
     db.entries = [entry]
     writer = BibTexWriter()
@@ -121,50 +121,52 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
 
     # Prepare TOML front matter for Markdown file.
     frontmatter = ['+++']
-    frontmatter.append('title = "{}"'.format(clean_bibtex_str(entry['title'])))
+    frontmatter.append(f'title = "{clean_bibtex_str(entry["title"])}"')
     if 'month' in entry:
-        frontmatter.append('date = {}-{}-01'.format(entry['year'], month2number(entry['month'])))
+        frontmatter.append(f"date = {entry['year']}-{month2number(entry['month'])}-01")
     else:
-        frontmatter.append('date = {}-01-01'.format(entry['year']))
+        frontmatter.append(f"date = {entry['year']}-01-01")
 
+    authors = None
     if 'author' in entry:
-        authors = clean_bibtex_authors([i.strip() for i in entry['author'].replace('\n', ' ').split(' and ')])
-        frontmatter.append('authors = [{}]'.format(', '.join(authors)))
+        authors = entry['author']
     elif 'editor' in entry:
-        authors = clean_bibtex_authors([i.strip() for i in entry['editor'].replace('\n', ' ').split(' and ')])
-        frontmatter.append('authors = [{}]'.format(', '.join(authors)))
+        authors = entry['editor']
+    if authors:
+        authors = clean_bibtex_authors([i.strip() for i in authors.replace('\n', ' ').split(' and ')])
+        frontmatter.append(f"authors = [{', '.join(authors)}]")
 
-    frontmatter.append('publication_types = ["{}"]'.format(PUB_TYPES.get(entry['ENTRYTYPE'], 0)))
+    frontmatter.append(f'publication_types = ["{PUB_TYPES.get(entry["ENTRYTYPE"], 0)}"]')
 
     if 'abstract' in entry:
-        frontmatter.append('abstract = "{}"'.format(clean_bibtex_str(entry['abstract'])))
+        frontmatter.append(f'abstract = "{clean_bibtex_str(entry["abstract"])}"')
     else:
         frontmatter.append('abstract = ""')
 
-    frontmatter.append('featured = {}'.format(str(featured).lower()))
+    frontmatter.append(f'featured = {str(featured).lower()}')
 
     # Publication name.
     if 'booktitle' in entry:
-        frontmatter.append('publication = "*{}*"'.format(clean_bibtex_str(entry['booktitle'])))
+        frontmatter.append(f'publication = "*{clean_bibtex_str(entry["booktitle"])}*"')
     elif 'journal' in entry:
-        frontmatter.append('publication = "*{}*"'.format(clean_bibtex_str(entry['journal'])))
+        frontmatter.append(f'publication = "*{clean_bibtex_str(entry["journal"])}*"')
     else:
         frontmatter.append('publication = ""')
 
     if 'keywords' in entry:
-        frontmatter.append('tags = [{}]'.format(clean_bibtex_tags(entry['keywords'])))
+        frontmatter.append(f'tags = [{clean_bibtex_tags(entry["keywords"])}]')
 
     if 'url' in entry:
-        frontmatter.append('url_pdf = "{}"'.format(clean_bibtex_str(entry['url'])))
+        frontmatter.append(f'url_pdf = "{clean_bibtex_str(entry["url"])}"')
 
     if 'doi' in entry:
-        frontmatter.append('doi = "{}"'.format(entry['doi']))
+        frontmatter.append(f'doi = "{entry["doi"]}"')
 
     frontmatter.append('+++\n\n')
 
     # Save Markdown file.
     try:
-        print("Saving Markdown to '{}'".format(markdown_path))
+        print(f"Saving Markdown to '{markdown_path}'")
         with open(markdown_path, 'w', encoding='utf-8') as f:
             f.write("\n".join(frontmatter))
     except IOError:
@@ -172,9 +174,9 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
 
 
 def slugify(s, lower=True):
-    bad_symbols = ('.','_',':')  # Symbols to replace with hyphen delimiter.
+    bad_symbols = ('.', '_', ':')  # Symbols to replace with hyphen delimiter.
     delimiter = '-'
-    good_symbols = (delimiter)  # Symbols to keep.
+    good_symbols = (delimiter,)  # Symbols to keep.
     for r in bad_symbols:
         s = s.replace(r, delimiter)
 
@@ -209,7 +211,7 @@ def clean_bibtex_authors(author_str):
         for item in first_names:
             if item in ['ben', 'van', 'der', 'de', 'la', 'le']:
                 last_name = first_names.pop() + ' ' + last_name
-        authors.append('"{} {}"'.format(' '.join(first_names), last_name))
+        authors.append(f'"{" ".join(first_names)} {last_name}"')
     return authors
 
 
@@ -218,14 +220,14 @@ def clean_bibtex_str(s):
     s = s.replace('\\', '')
     s = s.replace('"', '\\"')
     s = s.replace('{', '').replace('}', '')
-    s = s.replace('\t',' ').replace('\n','').replace('\r','')
+    s = s.replace('\t', ' ').replace('\n', '').replace('\r', '')
     return s
 
 
 def clean_bibtex_tags(s):
     """Clean BibTeX keywords and convert to TOML tags"""
     tags = clean_bibtex_str(s).split(',')
-    tags = ['"{}"'.format(tag.strip()) for tag in tags]
+    tags = [f'"{tag.strip()}"' for tag in tags]
     tags_str = ', '.join(tags)
     return tags_str
 
@@ -278,10 +280,10 @@ def import_assets():
             filepath = os.path.join(d, filename)
             js_files.append(filepath)
 
-            print('Downloading {} from {}...'.format(filename, url))
+            print(f'Downloading {filename} from {url}...')
             download_file(url, filepath)
 
-        print('Merging JS assets into {}'.format(JS_FILENAME))
+        print(f'Merging JS assets into {JS_FILENAME}')
         merge_files(js_files, JS_FILENAME)
 
         # Parse CSS assets
@@ -299,10 +301,10 @@ def import_assets():
             filepath = os.path.join(d, filename)
             css_files.append(filepath)
 
-            print('Downloading {} from {}...'.format(filename, url))
+            print(f'Downloading {filename} from {url}...')
             download_file(url, filepath)
 
-        print('Merging CSS assets into {}'.format(CSS_FILENAME))
+        print(f'Merging CSS assets into {CSS_FILENAME}')
         merge_files(css_files, CSS_FILENAME)
 
 
@@ -314,7 +316,7 @@ def download_file(url, file_name):
 
         # Check that we can access the specified URL OK.
         if response.status_code != 200:
-            print('ERROR could not download {}'.format(url))
+            print(f'ERROR could not download {url}')
             return
 
         # Write to file.

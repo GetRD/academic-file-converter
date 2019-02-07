@@ -46,6 +46,7 @@ setup(
     include_package_data=True,
     license='MIT',
     packages=find_packages(),
+    python_requires='>3.6',
     install_requires=['toml', 'requests', 'bibtexparser'],
     entry_points="""
         [console_scripts]

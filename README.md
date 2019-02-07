@@ -13,7 +13,7 @@ Features
 ## Prerequisites
 
 1. Install the [Academic](https://sourcethemes.com/academic/) website framework
-2. Install [Python 3](https://realpython.com/installing-python/) if it’s not already installed
+2. Install [Python 3.6+](https://realpython.com/installing-python/) if it’s not already installed
 3. [Version control](https://guides.github.com/introduction/git-handbook/#version-control) your website with [Git](http://rogerdudler.github.io/git-guide/) so that you can review the proposed changes and accept or reject them without risking breaking your site. Otherwise, if not using Git, backup your site prior to running this tool.
 
 ## Installation
@@ -39,7 +39,7 @@ Use the `cd` command to navigate to your website folder in the terminal:
 Optional arguments:
 
 * `--help` Help
-* `--featured` Flag publications as *featured* (to appear in *Selected Publications* widget)
+* `--featured` Flag publications as *featured* (to appear in *Featured Publications* widget)
 * `--overwrite` Overwrite existing publications
 * `--publication-dir PUBLICATION_DIR` Your publications directory (defaults to `publication`)
 
