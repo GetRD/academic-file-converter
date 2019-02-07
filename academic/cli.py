@@ -87,7 +87,7 @@ def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False
 
     # Load BibTeX file for parsing.
     with open(bibtex, 'r', encoding='utf-8') as bibtex_file:
-        parser = BibTexParser()
+        parser = BibTexParser(common_strings=True)
         parser.customization = convert_to_unicode
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
