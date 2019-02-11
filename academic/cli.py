@@ -56,6 +56,7 @@ def main():
                           help='Directory that your publications are stored in (default `publication`)')
     parser_a.add_argument("--featured", action='store_true', help='Flag publications as featured')
     parser_a.add_argument("--overwrite", action='store_true', help='Overwrite existing publications')
+    parser_a.add_argument("--normalize", action='store_true', help='Normalize each keyword to lowercase with uppercase first letter')
 
     args, unknown = parser.parse_known_args()
 
@@ -74,10 +75,10 @@ def main():
     elif args.command and args.assets:
         import_assets()
     elif args.command and args.bibtex:
-        import_bibtex(args.bibtex, pub_dir=args.publication_dir, featured=args.featured, overwrite=args.overwrite)
+        import_bibtex(args.bibtex, pub_dir=args.publication_dir, featured=args.featured, overwrite=args.overwrite, normalize=args.normalize)
 
 
-def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False):
+def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False, normalize=False):
     """Import publications from BibTeX file"""
 
     # Check BibTeX file exists.
@@ -91,10 +92,10 @@ def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False
         parser.customization = convert_to_unicode
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
-            parse_bibtex_entry(entry, pub_dir=pub_dir, featured=featured, overwrite=overwrite)
+            parse_bibtex_entry(entry, pub_dir=pub_dir, featured=featured, overwrite=overwrite, normalize=normalize)
 
 
-def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=False):
+def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=False, normalize=False):
     """Parse a bibtex entry and generate corresponding publication bundle"""
     print(f"Parsing entry {entry['ID']}")
 
@@ -154,7 +155,7 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
         frontmatter.append('publication = ""')
 
     if 'keywords' in entry:
-        frontmatter.append(f'tags = [{clean_bibtex_tags(entry["keywords"])}]')
+        frontmatter.append(f'tags = [{clean_bibtex_tags(entry["keywords"], normalize)}]')
 
     if 'url' in entry:
         frontmatter.append(f'url_pdf = "{clean_bibtex_str(entry["url"])}"')
@@ -224,10 +225,12 @@ def clean_bibtex_str(s):
     return s
 
 
-def clean_bibtex_tags(s):
+def clean_bibtex_tags(s, normalize=False):
     """Clean BibTeX keywords and convert to TOML tags"""
     tags = clean_bibtex_str(s).split(',')
     tags = [f'"{tag.strip()}"' for tag in tags]
+    if normalize:
+        tags = [tag.lower().capitalize() for tag in tags]
     tags_str = ', '.join(tags)
     return tags_str
 
