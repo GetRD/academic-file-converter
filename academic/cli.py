@@ -56,7 +56,7 @@ def main():
                           help='Directory that your publications are stored in (default `publication`)')
     parser_a.add_argument("--featured", action='store_true', help='Flag publications as featured')
     parser_a.add_argument("--overwrite", action='store_true', help='Overwrite existing publications')
-    parser_a.add_argument("--normalize", action='store_true', help='Lowercase and capitalize each keyword')
+    parser_a.add_argument("--normalize", action='store_true', help='Normalize each keyword to lowercase with uppercase first letter')
 
     args, unknown = parser.parse_known_args()
 
