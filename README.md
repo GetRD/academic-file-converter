@@ -41,7 +41,8 @@ Optional arguments:
 * `--help` Help
 * `--featured` Flag publications as *featured* (to appear in *Featured Publications* widget)
 * `--overwrite` Overwrite existing publications
-* `--publication-dir PUBLICATION_DIR` Your publications directory (defaults to `publication`)
+* `--publication-dir PUBLICATION_DIR` Path to your publications directory (defaults to `publication`)
+* `--normalize` Normalize tags by converting them to lowercase and capitalizing the first letter
 
 After importing publications, [a full text PDF and image can be associated with each item and further details added via extra parameters](https://sourcethemes.com/academic/docs/managing-content/#manually).
 
