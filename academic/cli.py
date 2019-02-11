@@ -331,7 +331,7 @@ def merge_files(file_path_list, destination):
     with open(destination, 'w', encoding='utf-8') as f:
         for file_path in file_path_list:
             with open(file_path, 'r', encoding='utf-8') as source_file:
-                f.write(source_file.read())
+                f.write(source_file.read() + '\n')
 
 
 if __name__ == '__main__':
