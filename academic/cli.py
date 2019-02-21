@@ -138,10 +138,13 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     # Prepare TOML front matter for Markdown file.
     frontmatter = ['+++']
     frontmatter.append(f'title = "{clean_bibtex_str(entry["title"])}"')
-    if 'month' in entry:
-        frontmatter.append(f"date = {entry['year']}-{month2number(entry['month'])}-01")
+    if 'date' in entry:
+        frontmatter.append(f"date = {entry['date']}")
     else:
-        frontmatter.append(f"date = {entry['year']}-01-01")
+        if 'month' in entry:
+            frontmatter.append(f"date = {entry['year']}-{month2number(entry['month'])}-01")
+        else:
+            frontmatter.append(f"date = {entry['year']}-01-01")
 
     authors = None
     if 'author' in entry:
