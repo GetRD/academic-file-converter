@@ -101,7 +101,7 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
 
     bundle_path = f"content/{pub_dir}/{slugify(entry['ID'])}"
     markdown_path = os.path.join(bundle_path, 'index.md')
-    cite_path = os.path.join(bundle_path, "{slugify(entry['ID'])}.bib")
+    cite_path = os.path.join(bundle_path, f"{slugify(entry['ID'])}.bib")
 
     # Do not overwrite publication bundle if it already exists.
     if not overwrite and os.path.isdir(bundle_path):
@@ -221,7 +221,7 @@ def clean_bibtex_str(s):
     s = s.replace('\\', '')
     s = s.replace('"', '\\"')
     s = s.replace('{', '').replace('}', '')
-    s = s.replace('\t', ' ').replace('\n', '').replace('\r', '')
+    s = s.replace('\t', ' ').replace('\n', ' ').replace('\r', '')
     return s
 
 
