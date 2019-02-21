@@ -58,6 +58,14 @@ def main():
     parser_a.add_argument("--overwrite", action='store_true', help='Overwrite existing publications')
     parser_a.add_argument("--normalize", action='store_true', help='Normalize each keyword to lowercase with uppercase first letter')
 
+    # Sub-parser for export command.
+    parser_b = subparsers.add_parser('export', help='Export data from Academic')
+    parser_b.add_argument("--assets", action='store_true',
+                          help='Import third-party JS and CSS for generating an offline site')
+    parser_b.add_argument("--bibtex", required=False, type=str, help='File path to your BibTeX file')
+    parser_b.add_argument("--publication-dir", required=False, type=str, default='publication',
+                          help='Directory that your publications are stored in (default `publication`)')
+
     args, unknown = parser.parse_known_args()
 
     # If no arguments, show help.
@@ -75,8 +83,10 @@ def main():
     elif args.command and args.assets:
         import_assets()
     elif args.command and args.bibtex:
-        import_bibtex(args.bibtex, pub_dir=args.publication_dir, featured=args.featured, overwrite=args.overwrite, normalize=args.normalize)
-
+        if args.command=='import':
+            import_bibtex(args.bibtex, pub_dir=args.publication_dir, featured=args.featured, overwrite=args.overwrite, normalize=args.normalize)
+        elif args.command=='export':
+            export_bibtex(args.bibtex, pub_dir=args.publication_dir)
 
 def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False, normalize=False):
     """Import publications from BibTeX file"""
@@ -94,6 +104,11 @@ def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False
         for entry in bib_database.entries:
             parse_bibtex_entry(entry, pub_dir=pub_dir, featured=featured, overwrite=overwrite, normalize=normalize)
 
+def export_bibtex(bibtex, pub_dir='publication'):
+    """Export publications to BibTeX file"""
+    p = Path(f"content/{pub_dir}")
+    file_path_list = sorted(p.glob('**/*.bib'))
+    merge_files(file_path_list, bibtex)
 
 def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=False, normalize=False):
     """Parse a bibtex entry and generate corresponding publication bundle"""
