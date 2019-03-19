@@ -129,7 +129,7 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
         if 'month' in entry:
             frontmatter.append(f"date = {entry['year']}-{month2number(entry['month'])}-01")
         else:
-            parsed_toml['date'] = f"{entry['year']}-01-01"
+            frontmatter.append(f"date = {entry['year']}-01-01")
 
     authors = None
     if 'author' in entry:
