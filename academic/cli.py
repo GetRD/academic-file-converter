@@ -119,7 +119,7 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
 
     # Do not overwrite publication bundle if it already exists.
     if not overwrite and os.path.isdir(bundle_path):
-        logger.info(f'Skipping creation of {bundle_path} as it already exists. To overwrite, add the `--overwrite` argument.')
+        logger.warning(f'Skipping creation of {bundle_path} as it already exists. To overwrite, add the `--overwrite` argument.')
         return
 
     # Create bundle dir.
