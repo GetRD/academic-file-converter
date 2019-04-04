@@ -97,7 +97,7 @@ def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False
 
     # Check BibTeX file exists.
     if not Path(bibtex).is_file():
-        print('Please check the path to your BibTeX file and re-run.')
+        logger.error('Please check the path to your BibTeX file and re-run.')
         return
 
     # Load BibTeX file for parsing.
@@ -111,7 +111,7 @@ def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False
 
 def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=False, normalize=False):
     """Parse a bibtex entry and generate corresponding publication bundle"""
-    print(f"Parsing entry {entry['ID']}")
+    logger.info(f"Parsing entry {entry['ID']}")
 
     bundle_path = f"content/{pub_dir}/{slugify(entry['ID'])}"
     markdown_path = os.path.join(bundle_path, 'index.md')
@@ -119,15 +119,15 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
 
     # Do not overwrite publication bundle if it already exists.
     if not overwrite and os.path.isdir(bundle_path):
-        print(f'Skipping creation of {bundle_path} as it already exists. To overwrite, add the `--overwrite` argument.')
+        logger.info(f'Skipping creation of {bundle_path} as it already exists. To overwrite, add the `--overwrite` argument.')
         return
 
     # Create bundle dir.
-    print(f'Creating folder {bundle_path}')
+    logger.info(f'Creating folder {bundle_path}')
     Path(bundle_path).mkdir(parents=True, exist_ok=True)
 
     # Save citation file.
-    print(f'Saving citation to {cite_path}')
+    logger.info(f'Saving citation to {cite_path}')
     db = BibDatabase()
     db.entries = [entry]
     writer = BibTexWriter()
@@ -181,11 +181,11 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
 
     # Save Markdown file.
     try:
-        print(f"Saving Markdown to '{markdown_path}'")
+        logger.info(f"Saving Markdown to '{markdown_path}'")
         with open(markdown_path, 'w', encoding='utf-8') as f:
             f.write("\n".join(frontmatter))
     except IOError:
-        print('ERROR: could not save file.')
+        logger.error('ERROR: could not save file.')
 
 
 def slugify(s, lower=True):
@@ -263,21 +263,21 @@ def import_assets():
 
     # Check that we are in an Academic website folder.
     if not Path('content').is_dir():
-        print('Please navigate to your website folder and re-run.')
+        logger.error('Please navigate to your website folder and re-run.')
         return
 
     # Check compatibility with user's Academic version (v2.4.0+ required for local asset bundling)
     # `academic.toml` was added in Academic v2.4.0, so can simply check for the existence of that file.
     academic_filename = 'themes/academic/data/academic.toml'
     if not Path(academic_filename).is_file():
-        print('Could not detect Academic version in `themes/academic/data/academic.toml`. You may need to update Academic in order to use this tool.')
+        logger.error('Could not detect Academic version in `themes/academic/data/academic.toml`. You may need to update Academic in order to use this tool.')
         return
 
     # Check assets file exists
     # Note that the order of assets in `assets.toml` matters since they will be concatenated in the order they appear.
     assets_filename = 'themes/academic/data/assets.toml'
     if not Path(assets_filename).is_file():
-        print('Could not detect assets file. You may need to update Academic in order to use this tool.')
+        logger.error('Could not detect assets file. You may need to update Academic in order to use this tool.')
         return
 
     # Create output dirs if necessary
@@ -297,10 +297,10 @@ def import_assets():
             filepath = os.path.join(d, filename)
             js_files.append(filepath)
 
-            print(f'Downloading {filename} from {url}...')
+            logger.info(f'Downloading {filename} from {url}...')
             download_file(url, filepath)
 
-        print(f'Merging JS assets into {JS_FILENAME}')
+        logger.info(f'Merging JS assets into {JS_FILENAME}')
         merge_files(js_files, JS_FILENAME)
 
         # Parse CSS assets
@@ -318,10 +318,10 @@ def import_assets():
             filepath = os.path.join(d, filename)
             css_files.append(filepath)
 
-            print(f'Downloading {filename} from {url}...')
+            logger.info(f'Downloading {filename} from {url}...')
             download_file(url, filepath)
 
-        print(f'Merging CSS assets into {CSS_FILENAME}')
+        logger.info(f'Merging CSS assets into {CSS_FILENAME}')
         merge_files(css_files, CSS_FILENAME)
 
 
@@ -333,7 +333,7 @@ def download_file(url, file_name):
 
         # Check that we can access the specified URL OK.
         if response.status_code != 200:
-            print(f'ERROR could not download {url}')
+            logger.info(f'ERROR could not download {url}')
             return
 
         # Write to file.
