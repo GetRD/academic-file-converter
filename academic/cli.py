@@ -13,6 +13,7 @@ from urllib.parse import urlparse
 import tempfile
 import calendar
 from academic import __version__ as version
+import logging
 
 import bibtexparser
 from bibtexparser.bparser import BibTexParser
@@ -39,6 +40,13 @@ PUB_TYPES = {
     'unpublished': 3
 }
 
+# Logger object
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+# Handler in charge of logging to the console
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.INFO)
+logger.addHandler(stream_handler)
 
 def main():
     """Parse command-line arguments"""
@@ -57,6 +65,7 @@ def main():
     parser_a.add_argument("--featured", action='store_true', help='Flag publications as featured')
     parser_a.add_argument("--overwrite", action='store_true', help='Overwrite existing publications')
     parser_a.add_argument("--normalize", action='store_true', help='Normalize each keyword to lowercase with uppercase first letter')
+    parser_a.add_argument("-v", "--verbose", action='store_true', required=False, help='Activate verbose mode')
 
     args, unknown = parser.parse_known_args()
 
@@ -72,11 +81,16 @@ def main():
         if sys.argv[1:]:
             cmd.append(sys.argv[1:])
         subprocess.call(cmd)
-    elif args.command and args.assets:
-        import_assets()
-    elif args.command and args.bibtex:
-        import_bibtex(args.bibtex, pub_dir=args.publication_dir, featured=args.featured, overwrite=args.overwrite, normalize=args.normalize)
-
+    else:
+        # Set logging level to debug if '--verbose' had been passed
+        if args.command and args.verbose:
+            logger.setLevel(logging.DEBUG)
+            stream_handler.setLevel(logging.DEBUG)
+        # Process commands
+        if args.command and args.assets:
+            import_assets()
+        elif args.command and args.bibtex:
+            import_bibtex(args.bibtex, pub_dir=args.publication_dir, featured=args.featured, overwrite=args.overwrite, normalize=args.normalize)
 
 def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False, normalize=False):
     """Import publications from BibTeX file"""
