@@ -128,6 +128,8 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     else:
         frontmatter.append(f"date = {entry['year']}-01-01")
 
+    frontmatter.append(f"publishdate = 2019-01-01")
+
     authors = None
     if 'author' in entry:
         authors = entry['author']
