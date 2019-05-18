@@ -33,7 +33,7 @@ PUB_TYPES = {
     'manual': 4,
     'mastersthesis': 4,
     'misc': 0,
-    'phdthesis': 4,
+    'phdthesis': 7,
     'proceedings': 0,
     'techreport': 4,
     'unpublished': 3
