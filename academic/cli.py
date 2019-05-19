@@ -31,11 +31,12 @@ PUB_TYPES = {
     'incollection': 6,
     'inproceedings': 1,
     'manual': 4,
-    'mastersthesis': 4,
+    'mastersthesis': 7,
     'misc': 0,
     'phdthesis': 7,
     'proceedings': 0,
     'techreport': 4,
+    'patent': 8,
     'unpublished': 3
 }
 
