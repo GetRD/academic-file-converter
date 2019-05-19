@@ -36,8 +36,8 @@ PUB_TYPES = {
     'phdthesis': 7,
     'proceedings': 0,
     'techreport': 4,
-    'patent': 8,
-    'unpublished': 3
+    'unpublished': 3,
+    'patent': 8
 }
 
 
