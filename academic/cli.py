@@ -59,6 +59,8 @@ def main():
     parser_a.add_argument("--featured", action='store_true', help='Flag publications as featured')
     parser_a.add_argument("--overwrite", action='store_true', help='Overwrite existing publications')
     parser_a.add_argument("--normalize", action='store_true', help='Normalize each keyword to lowercase with uppercase first letter')
+    parser_a.add_argument("--url-list", required=False, type=str, default=None,
+                          help="File containing an ordered list of URLs to associate with bibtex entries, one per line")
 
     args, unknown = parser.parse_known_args()
 
@@ -77,10 +79,11 @@ def main():
     elif args.command and args.assets:
         import_assets()
     elif args.command and args.bibtex:
-        import_bibtex(args.bibtex, pub_dir=args.publication_dir, featured=args.featured, overwrite=args.overwrite, normalize=args.normalize)
+        import_bibtex(args.bibtex, pub_dir=args.publication_dir, featured=args.featured, overwrite=args.overwrite, normalize=args.normalize,
+                      url_list=args.url_list)
 
 
-def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False, normalize=False):
+def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False, normalize=False, url_list=None):
     """Import publications from BibTeX file"""
 
     # Check BibTeX file exists.
@@ -88,12 +91,21 @@ def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False
         print('Please check the path to your BibTeX file and re-run.')
         return
 
+    if url_list is not None:
+        if not Path(url_list).is_file():
+            print('Please check the path to your URL list and re-run.')
+            return
+        url_list = {i: _.strip() for i, _ in enumerate(open(url_list))}
+    else:
+        url_list = {}
     # Load BibTeX file for parsing.
     with open(bibtex, 'r', encoding='utf-8') as bibtex_file:
         parser = BibTexParser(common_strings=True)
         parser.customization = convert_to_unicode
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
-        for entry in bib_database.entries:
+        for i, entry in enumerate(bib_database.entries):
+            if url_list.get(i, None) is not None:
+                entry.setdefault("url", url_list[i])
             parse_bibtex_entry(entry, pub_dir=pub_dir, featured=featured, overwrite=overwrite, normalize=normalize)
 
 

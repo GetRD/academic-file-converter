@@ -43,6 +43,7 @@ Optional arguments:
 * `--overwrite` Overwrite existing publications
 * `--publication-dir PUBLICATION_DIR` Path to your publications directory (defaults to `publication`)
 * `--normalize` Normalize tags by converting them to lowercase and capitalizing the first letter
+* `--url-lis` A file containing one URL per line that corresponds to the BibTeX entries. Useful if your BibTeX system does not include URLs in its export.
 
 After importing publications, [a full text PDF and image can be associated with each item and further details added via extra parameters](https://sourcethemes.com/academic/docs/managing-content/#manually).
 
