@@ -1,6 +1,7 @@
 # Admin Tool for Academic
 
 [![Download from PyPI](https://img.shields.io/pypi/v/academic.svg)](https://pypi.python.org/pypi/academic)
+[![Download from Anaconda](https://anaconda.org/conda-forge/academic/badges/version.svg)](https://anaconda.org/conda-forge/academic)
 [![License](https://img.shields.io/pypi/l/academic.svg)](https://pypi.python.org/pypi/academic)
 
 An admin tool for [Academic](https://sourcethemes.com/academic/).
