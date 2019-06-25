@@ -157,6 +157,8 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
         frontmatter.append(f'publication: "*{clean_bibtex_str(entry["booktitle"])}*"')
     elif 'journal' in entry:
         frontmatter.append(f'publication: "*{clean_bibtex_str(entry["journal"])}*"')
+    elif 'publisher' in entry:
+        frontmatter.append(f'publication: "*{clean_bibtex_str(entry["publisher"])}*"')
     else:
         frontmatter.append('publication: ""')
 
