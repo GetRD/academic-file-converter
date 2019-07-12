@@ -12,6 +12,7 @@ from requests import get
 from urllib.parse import urlparse
 import tempfile
 import calendar
+from datetime import datetime
 from academic import __version__ as version
 
 import bibtexparser
@@ -31,12 +32,13 @@ PUB_TYPES = {
     'incollection': 6,
     'inproceedings': 1,
     'manual': 4,
-    'mastersthesis': 4,
+    'mastersthesis': 7,
     'misc': 0,
-    'phdthesis': 4,
+    'phdthesis': 7,
     'proceedings': 0,
     'techreport': 4,
-    'unpublished': 3
+    'unpublished': 3,
+    'patent': 8
 }
 
 
@@ -102,6 +104,8 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     bundle_path = f"content/{pub_dir}/{slugify(entry['ID'])}"
     markdown_path = os.path.join(bundle_path, 'index.md')
     cite_path = os.path.join(bundle_path, f"{slugify(entry['ID'])}.bib")
+    date = datetime.utcnow()
+    timestamp = date.isoformat('T') + 'Z'  # RFC 3339 timestamp.
 
     # Do not overwrite publication bundle if it already exists.
     if not overwrite and os.path.isdir(bundle_path):
@@ -120,9 +124,9 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     with open(cite_path, 'w', encoding='utf-8') as f:
         f.write(writer.write(db))
 
-    # Prepare TOML front matter for Markdown file.
-    frontmatter = ['+++']
-    frontmatter.append(f'title = "{clean_bibtex_str(entry["title"])}"')
+    # Prepare YAML front matter for Markdown file.
+    frontmatter = ['---']
+    frontmatter.append(f'title: "{clean_bibtex_str(entry["title"])}"')
     if 'date' in entry:
         frontmatter.append(f"date = {entry['date']}")
     else:
@@ -131,6 +135,8 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
         else:
             frontmatter.append(f"date = {entry['year']}-01-01")
 
+    frontmatter.append(f"publishDate: {timestamp}")
+
     authors = None
     if 'author' in entry:
         authors = entry['author']
@@ -138,35 +144,37 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
         authors = entry['editor']
     if authors:
         authors = clean_bibtex_authors([i.strip() for i in authors.replace('\n', ' ').split(' and ')])
-        frontmatter.append(f"authors = [{', '.join(authors)}]")
+        frontmatter.append(f"authors: [{', '.join(authors)}]")
 
-    frontmatter.append(f'publication_types = ["{PUB_TYPES.get(entry["ENTRYTYPE"], 0)}"]')
+    frontmatter.append(f'publication_types: ["{PUB_TYPES.get(entry["ENTRYTYPE"], 0)}"]')
 
     if 'abstract' in entry:
-        frontmatter.append(f'abstract = "{clean_bibtex_str(entry["abstract"])}"')
+        frontmatter.append(f'abstract: "{clean_bibtex_str(entry["abstract"])}"')
     else:
-        frontmatter.append('abstract = ""')
+        frontmatter.append('abstract: ""')
 
-    frontmatter.append(f'featured = {str(featured).lower()}')
+    frontmatter.append(f'featured: {str(featured).lower()}')
 
     # Publication name.
     if 'booktitle' in entry:
-        frontmatter.append(f'publication = "*{clean_bibtex_str(entry["booktitle"])}*"')
+        frontmatter.append(f'publication: "*{clean_bibtex_str(entry["booktitle"])}*"')
     elif 'journal' in entry:
-        frontmatter.append(f'publication = "*{clean_bibtex_str(entry["journal"])}*"')
+        frontmatter.append(f'publication: "*{clean_bibtex_str(entry["journal"])}*"')
+    elif 'publisher' in entry:
+        frontmatter.append(f'publication: "*{clean_bibtex_str(entry["publisher"])}*"')
     else:
-        frontmatter.append('publication = ""')
+        frontmatter.append('publication: ""')
 
     if 'keywords' in entry:
-        frontmatter.append(f'tags = [{clean_bibtex_tags(entry["keywords"], normalize)}]')
+        frontmatter.append(f'tags: [{clean_bibtex_tags(entry["keywords"], normalize)}]')
 
     if 'url' in entry:
-        frontmatter.append(f'url_pdf = "{clean_bibtex_str(entry["url"])}"')
+        frontmatter.append(f'url_pdf: "{clean_bibtex_str(entry["url"])}"')
 
     if 'doi' in entry:
-        frontmatter.append(f'doi = "{entry["doi"]}"')
+        frontmatter.append(f'doi: "{entry["doi"]}"')
 
-    frontmatter.append('+++\n\n')
+    frontmatter.append('---\n\n')
 
     # Save Markdown file.
     try:
