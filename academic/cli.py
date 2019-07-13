@@ -125,12 +125,18 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     # Prepare YAML front matter for Markdown file.
     frontmatter = ['---']
     frontmatter.append(f'title: "{clean_bibtex_str(entry["title"])}"')
-    if 'month' in entry:
-        frontmatter.append(f"date: {entry['year']}-{month2number(entry['month'])}-01")
+    if 'date' in entry:
+        frontmatter.append(f"date: {entry['date']}")
+        frontmatter.append(f"publishDate: {entry['date'].split('/')[0]}") # take the first date of a range
     else:
-        frontmatter.append(f"date: {entry['year']}-01-01")
+        if 'month' in entry:
+            frontmatter.append(f"date: {entry['year']}-{month2number(entry['month'])}-01")
+            frontmatter.append(f"publishDate: {entry['year']}-{month2number(entry['month'])}-01")
+        else:
+            frontmatter.append(f"date: {entry['year']}-01-01")
+            frontmatter.append(f"publishDate: {entry['year']}-01-01")
 
-    frontmatter.append(f"publishDate: {timestamp}")
+    #frontmatter.append(f"publishDate: {timestamp}") # this makes all publications pubished at the same date!
 
     authors = None
     if 'author' in entry:
