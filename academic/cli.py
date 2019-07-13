@@ -103,7 +103,8 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
 
     bundle_path = f"content/{pub_dir}/{slugify(entry['ID'])}"
     markdown_path = os.path.join(bundle_path, 'index.md')
-    cite_path = os.path.join(bundle_path, f"{slugify(entry['ID'])}.bib")
+    #cite_path = os.path.join(bundle_path, f"{slugify(entry['ID'])}.bib")
+    cite_path = os.path.join(bundle_path, f"cite.bib")
     date = datetime.utcnow()
     timestamp = date.isoformat('T') + 'Z'  # RFC 3339 timestamp.
 
@@ -120,9 +121,6 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     print(f'Saving citation to {cite_path}')
     db = BibDatabase()
     db.entries = [entry]
-    writer = BibTexWriter()
-    with open(cite_path, 'w', encoding='utf-8') as f:
-        f.write(writer.write(db))
 
     # Prepare YAML front matter for Markdown file.
     frontmatter = ['---']
@@ -147,6 +145,7 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
 
     if 'abstract' in entry:
         frontmatter.append(f'abstract: "{clean_bibtex_str(entry["abstract"])}"')
+        del entry["abstract"] # Remove abstract from citation file
     else:
         frontmatter.append('abstract: ""')
 
@@ -171,6 +170,13 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     if 'doi' in entry:
         frontmatter.append(f'doi: "{entry["doi"]}"')
 
+    # Projects identifier(s).
+    if 'projects' in entry:
+        frontmatter.append(f'projects:')
+        for temp in entry["projects"].split():
+            frontmatter.append(f'- {temp}')
+        del entry["projects"] # Remove projects from citation file
+
     frontmatter.append('---\n\n')
 
     # Save Markdown file.
@@ -180,6 +186,11 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
             f.write("\n".join(frontmatter))
     except IOError:
         print('ERROR: could not save file.')
+
+    # Save citation file
+    writer = BibTexWriter()
+    with open(cite_path, 'w', encoding='utf-8') as f:
+        f.write(writer.write(db))
 
 
 def slugify(s, lower=True):
