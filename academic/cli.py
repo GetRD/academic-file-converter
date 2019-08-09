@@ -103,7 +103,7 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
 
     bundle_path = f"content/{pub_dir}/{slugify(entry['ID'])}"
     markdown_path = os.path.join(bundle_path, 'index.md')
-    cite_path = os.path.join(bundle_path, f"{slugify(entry['ID'])}.bib")
+    cite_path = os.path.join(bundle_path, f"cite.bib")
     date = datetime.utcnow()
     timestamp = date.isoformat('T') + 'Z'  # RFC 3339 timestamp.
 
