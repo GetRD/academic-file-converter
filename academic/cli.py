@@ -12,8 +12,8 @@ from requests import get
 from urllib.parse import urlparse
 import tempfile
 import calendar
-from academic import __version__ as version
 import logging
+from academic import __version__ as version
 
 import bibtexparser
 from bibtexparser.bparser import BibTexParser
@@ -40,16 +40,14 @@ PUB_TYPES = {
     'unpublished': 3
 }
 
-# Logger object
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-# Handler in charge of logging to the console
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.INFO)
-logger.addHandler(stream_handler)
 
 def main():
     """Parse command-line arguments"""
+    
+    # Initialise logger.
+    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.DEBUG, datefmt='%I:%M:%S%p')
+    
+    # Initialise command parser.
     parser = argparse.ArgumentParser(
         description=f'Academic Admin Tool v{version}\nhttps://sourcethemes.com/academic/',
         formatter_class=RawTextHelpFormatter)
@@ -333,7 +331,7 @@ def download_file(url, file_name):
 
         # Check that we can access the specified URL OK.
         if response.status_code != 200:
-            logger.info(f'ERROR could not download {url}')
+            logger.error(f'Could not download {url}')
             return
 
         # Write to file.
