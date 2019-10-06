@@ -63,7 +63,7 @@ def main():
     parser_a.add_argument("--featured", action='store_true', help='Flag publications as featured')
     parser_a.add_argument("--overwrite", action='store_true', help='Overwrite existing publications')
     parser_a.add_argument("--normalize", action='store_true', help='Normalize each keyword to lowercase with uppercase first letter')
-    parser_a.add_argument("-v", "--verbose", action='store_true', required=False, help='Activate verbose mode')
+    parser_a.add_argument("-v", "--verbose", action='store_true', required=False, help='Verbose mode')
 
     args, unknown = parser.parse_known_args()
 
@@ -183,7 +183,7 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
         with open(markdown_path, 'w', encoding='utf-8') as f:
             f.write("\n".join(frontmatter))
     except IOError:
-        logger.error('ERROR: could not save file.')
+        logger.error('Could not save file.')
 
 
 def slugify(s, lower=True):
