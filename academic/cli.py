@@ -40,12 +40,12 @@ PUB_TYPES = {
     'unpublished': 3
 }
 
+# Initialise logger.
+log = logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.WARNING, datefmt='%I:%M:%S%p')
+    
 
 def main():
     """Parse command-line arguments"""
-    
-    # Initialise logger.
-    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.DEBUG, datefmt='%I:%M:%S%p')
     
     # Initialise command parser.
     parser = argparse.ArgumentParser(
@@ -80,14 +80,15 @@ def main():
             cmd.append(sys.argv[1:])
         subprocess.call(cmd)
     else:
-        # Set logging level to debug if '--verbose' had been passed
+        # The command has been recognised, proceed to parse it.
         if args.command and args.verbose:
-            logger.setLevel(logging.DEBUG)
-            stream_handler.setLevel(logging.DEBUG)
-        # Process commands
+            # Set logging level to debug if verbose mode activated.
+            logging.getLogger().setLevel(logging.DEBUG)
         if args.command and args.assets:
+            # Run command to import assets.
             import_assets()
         elif args.command and args.bibtex:
+            # Run command to import bibtex.
             import_bibtex(args.bibtex, pub_dir=args.publication_dir, featured=args.featured, overwrite=args.overwrite, normalize=args.normalize)
 
 def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False, normalize=False):
@@ -95,7 +96,7 @@ def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False
 
     # Check BibTeX file exists.
     if not Path(bibtex).is_file():
-        logger.error('Please check the path to your BibTeX file and re-run.')
+        log.error('Please check the path to your BibTeX file and re-run.')
         return
 
     # Load BibTeX file for parsing.
@@ -109,7 +110,7 @@ def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False
 
 def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=False, normalize=False):
     """Parse a bibtex entry and generate corresponding publication bundle"""
-    logger.info(f"Parsing entry {entry['ID']}")
+    log.info(f"Parsing entry {entry['ID']}")
 
     bundle_path = f"content/{pub_dir}/{slugify(entry['ID'])}"
     markdown_path = os.path.join(bundle_path, 'index.md')
@@ -117,15 +118,15 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
 
     # Do not overwrite publication bundle if it already exists.
     if not overwrite and os.path.isdir(bundle_path):
-        logger.warning(f'Skipping creation of {bundle_path} as it already exists. To overwrite, add the `--overwrite` argument.')
+        log.warning(f'Skipping creation of {bundle_path} as it already exists. To overwrite, add the `--overwrite` argument.')
         return
 
     # Create bundle dir.
-    logger.info(f'Creating folder {bundle_path}')
+    log.info(f'Creating folder {bundle_path}')
     Path(bundle_path).mkdir(parents=True, exist_ok=True)
 
     # Save citation file.
-    logger.info(f'Saving citation to {cite_path}')
+    log.info(f'Saving citation to {cite_path}')
     db = BibDatabase()
     db.entries = [entry]
     writer = BibTexWriter()
@@ -179,11 +180,11 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
 
     # Save Markdown file.
     try:
-        logger.info(f"Saving Markdown to '{markdown_path}'")
+        log.info(f"Saving Markdown to '{markdown_path}'")
         with open(markdown_path, 'w', encoding='utf-8') as f:
             f.write("\n".join(frontmatter))
     except IOError:
-        logger.error('Could not save file.')
+        log.error('Could not save file.')
 
 
 def slugify(s, lower=True):
@@ -261,21 +262,21 @@ def import_assets():
 
     # Check that we are in an Academic website folder.
     if not Path('content').is_dir():
-        logger.error('Please navigate to your website folder and re-run.')
+        log.error('Please navigate to your website folder and re-run.')
         return
 
     # Check compatibility with user's Academic version (v2.4.0+ required for local asset bundling)
     # `academic.toml` was added in Academic v2.4.0, so can simply check for the existence of that file.
     academic_filename = 'themes/academic/data/academic.toml'
     if not Path(academic_filename).is_file():
-        logger.error('Could not detect Academic version in `themes/academic/data/academic.toml`. You may need to update Academic in order to use this tool.')
+        log.error('Could not detect Academic version in `themes/academic/data/academic.toml`. You may need to update Academic in order to use this tool.')
         return
 
     # Check assets file exists
     # Note that the order of assets in `assets.toml` matters since they will be concatenated in the order they appear.
     assets_filename = 'themes/academic/data/assets.toml'
     if not Path(assets_filename).is_file():
-        logger.error('Could not detect assets file. You may need to update Academic in order to use this tool.')
+        log.error('Could not detect assets file. You may need to update Academic in order to use this tool.')
         return
 
     # Create output dirs if necessary
@@ -295,10 +296,10 @@ def import_assets():
             filepath = os.path.join(d, filename)
             js_files.append(filepath)
 
-            logger.info(f'Downloading {filename} from {url}...')
+            log.info(f'Downloading {filename} from {url}...')
             download_file(url, filepath)
 
-        logger.info(f'Merging JS assets into {JS_FILENAME}')
+        log.info(f'Merging JS assets into {JS_FILENAME}')
         merge_files(js_files, JS_FILENAME)
 
         # Parse CSS assets
@@ -316,10 +317,10 @@ def import_assets():
             filepath = os.path.join(d, filename)
             css_files.append(filepath)
 
-            logger.info(f'Downloading {filename} from {url}...')
+            log.info(f'Downloading {filename} from {url}...')
             download_file(url, filepath)
 
-        logger.info(f'Merging CSS assets into {CSS_FILENAME}')
+        log.info(f'Merging CSS assets into {CSS_FILENAME}')
         merge_files(css_files, CSS_FILENAME)
 
 
@@ -331,7 +332,7 @@ def download_file(url, file_name):
 
         # Check that we can access the specified URL OK.
         if response.status_code != 200:
-            logger.error(f'Could not download {url}')
+            log.error(f'Could not download {url}')
             return
 
         # Write to file.
