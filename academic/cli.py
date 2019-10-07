@@ -143,7 +143,7 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     if 'year' in entry and year == '':
         year = entry['year']
     if len(year) == 0:
-        print('No valid year or date')
+        log.error(f'Invalid date for entry `{entry["ID"]}`.')
     frontmatter.append(f"date: {year}-{month}-{day}")
 
     frontmatter.append(f"publishDate: {timestamp}")
