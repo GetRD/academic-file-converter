@@ -272,12 +272,15 @@ def clean_bibtex_tags(s, normalize=False):
 
 
 def month2number(month):
-    """Convert BibTeX month to numeric"""
-    month_abbr = month.strip()[:3].title()
-    try:
-        return str(list(calendar.month_abbr).index(month_abbr)).zfill(2)
-    except ValueError:
-        raise ValueError('Please update your BibTeX with valid months')
+    """Convert BibTeX or BibLateX month to numeric"""
+    if len(month) <= 2:  # Assume a 1 or 2 digit numeric month has been given.
+        return month.zfill(2)
+    else:  # Assume a textual month has been given.
+        month_abbr = month.strip()[:3].title()
+        try:
+            return str(list(calendar.month_abbr).index(month_abbr)).zfill(2)
+        except ValueError:
+            raise log.error('Please update the entry with a valid month.')
 
 
 def import_assets():
