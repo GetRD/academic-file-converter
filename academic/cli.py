@@ -141,10 +141,24 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     # Prepare YAML front matter for Markdown file.
     frontmatter = ['---']
     frontmatter.append(f'title: "{clean_bibtex_str(entry["title"])}"')
-    if 'month' in entry:
-        frontmatter.append(f"date: {entry['year']}-{month2number(entry['month'])}-01")
-    else:
-        frontmatter.append(f"date: {entry['year']}-01-01")
+    year = ''
+    month = '01'
+    day = '01'
+    if 'date' in entry:
+        dateparts = entry['date'].split('-')
+        if len(dateparts) == 3:
+            year, month, day = dateparts[0], dateparts[1], dateparts[2]
+        elif len(dateparts) == 2:
+            year, month = dateparts[0], dateparts[1]
+        elif len(dateparts) == 1:
+            year = dateparts[0]
+    if 'month' in entry and month == '01':
+        month = month2number(entry['month'])
+    if 'year' in entry and year == '':
+        year = entry['year']
+    if len(year) == 0:
+        log.error(f'Invalid date for entry `{entry["ID"]}`.')
+    frontmatter.append(f"date: {year}-{month}-{day}")
 
     frontmatter.append(f"publishDate: {timestamp}")
 
