@@ -1,6 +1,7 @@
 # Admin Tool for Academic
 
 [![Download from PyPI](https://img.shields.io/pypi/v/academic.svg)](https://pypi.python.org/pypi/academic)
+[![Download from Anaconda](https://anaconda.org/conda-forge/academic/badges/version.svg)](https://anaconda.org/conda-forge/academic)
 [![License](https://img.shields.io/pypi/l/academic.svg)](https://pypi.python.org/pypi/academic)
 
 An admin tool for [Academic](https://sourcethemes.com/academic/).
@@ -43,6 +44,7 @@ Optional arguments:
 * `--overwrite` Overwrite existing publications
 * `--publication-dir PUBLICATION_DIR` Path to your publications directory (defaults to `publication`)
 * `--normalize` Normalize tags by converting them to lowercase and capitalizing the first letter
+* `--verbose` or `-v` Show verbose messages
 
 After importing publications, [a full text PDF and image can be associated with each item and further details added via extra parameters](https://sourcethemes.com/academic/docs/managing-content/#manually).
 
@@ -62,8 +64,19 @@ For local development, clone this repository and install the tool using the foll
 
     pip3 install -e .
 
+## Support
+
+Support development of Academic:
+
+  - [Donate a coffee](https://paypal.me/cushen)
+  - [Become a backer on Patreon](https://www.patreon.com/cushen)
+  - [Decorate your laptop or journal with an Academic sticker](https://www.redbubble.com/people/neutreno/works/34387919-academic)
+  - [Wear the T-shirt](https://academic.threadless.com/)
+
 ## License
 
 Copyright 2018-present [George Cushen](https://georgecushen.com).
 
 Licensed under the [MIT License](https://github.com/sourcethemes/academic-admin/blob/master/LICENSE.md).
+
+[![Analytics](https://ga-beacon.appspot.com/UA-78646709-2/academic-admin/readme?pixel)](https://github.com/igrigorik/ga-beacon)

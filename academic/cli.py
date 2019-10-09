@@ -12,6 +12,8 @@ from requests import get
 from urllib.parse import urlparse
 import tempfile
 import calendar
+import logging
+from datetime import datetime
 from academic import __version__ as version
 
 import bibtexparser
@@ -31,17 +33,23 @@ PUB_TYPES = {
     'incollection': 6,
     'inproceedings': 1,
     'manual': 4,
-    'mastersthesis': 4,
+    'mastersthesis': 7,
     'misc': 0,
-    'phdthesis': 4,
+    'phdthesis': 7,
     'proceedings': 0,
     'techreport': 4,
-    'unpublished': 3
+    'unpublished': 3,
+    'patent': 8
 }
 
+# Initialise logger.
+log = logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.WARNING, datefmt='%I:%M:%S%p')
+    
 
 def main():
     """Parse command-line arguments"""
+    
+    # Initialise command parser.
     parser = argparse.ArgumentParser(
         description=f'Academic Admin Tool v{version}\nhttps://sourcethemes.com/academic/',
         formatter_class=RawTextHelpFormatter)
@@ -57,6 +65,7 @@ def main():
     parser_a.add_argument("--featured", action='store_true', help='Flag publications as featured')
     parser_a.add_argument("--overwrite", action='store_true', help='Overwrite existing publications')
     parser_a.add_argument("--normalize", action='store_true', help='Normalize each keyword to lowercase with uppercase first letter')
+    parser_a.add_argument("-v", "--verbose", action='store_true', required=False, help='Verbose mode')
 
     args, unknown = parser.parse_known_args()
 
@@ -72,24 +81,31 @@ def main():
         if sys.argv[1:]:
             cmd.append(sys.argv[1:])
         subprocess.call(cmd)
-    elif args.command and args.assets:
-        import_assets()
-    elif args.command and args.bibtex:
-        import_bibtex(args.bibtex, pub_dir=args.publication_dir, featured=args.featured, overwrite=args.overwrite, normalize=args.normalize)
-
+    else:
+        # The command has been recognised, proceed to parse it.
+        if args.command and args.verbose:
+            # Set logging level to debug if verbose mode activated.
+            logging.getLogger().setLevel(logging.DEBUG)
+        if args.command and args.assets:
+            # Run command to import assets.
+            import_assets()
+        elif args.command and args.bibtex:
+            # Run command to import bibtex.
+            import_bibtex(args.bibtex, pub_dir=args.publication_dir, featured=args.featured, overwrite=args.overwrite, normalize=args.normalize)
 
 def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False, normalize=False):
     """Import publications from BibTeX file"""
 
     # Check BibTeX file exists.
     if not Path(bibtex).is_file():
-        print('Please check the path to your BibTeX file and re-run.')
+        log.error('Please check the path to your BibTeX file and re-run.')
         return
 
     # Load BibTeX file for parsing.
     with open(bibtex, 'r', encoding='utf-8') as bibtex_file:
         parser = BibTexParser(common_strings=True)
         parser.customization = convert_to_unicode
+        parser.ignore_nonstandard_types = False
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
             parse_bibtex_entry(entry, pub_dir=pub_dir, featured=featured, overwrite=overwrite, normalize=normalize)
@@ -97,36 +113,54 @@ def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False
 
 def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=False, normalize=False):
     """Parse a bibtex entry and generate corresponding publication bundle"""
-    print(f"Parsing entry {entry['ID']}")
+    log.info(f"Parsing entry {entry['ID']}")
 
     bundle_path = f"content/{pub_dir}/{slugify(entry['ID'])}"
     markdown_path = os.path.join(bundle_path, 'index.md')
-    cite_path = os.path.join(bundle_path, f"{slugify(entry['ID'])}.bib")
+    cite_path = os.path.join(bundle_path, 'cite.bib')
+    date = datetime.utcnow()
+    timestamp = date.isoformat('T') + 'Z'  # RFC 3339 timestamp.
 
     # Do not overwrite publication bundle if it already exists.
     if not overwrite and os.path.isdir(bundle_path):
-        print(f'Skipping creation of {bundle_path} as it already exists. To overwrite, add the `--overwrite` argument.')
+        log.warning(f'Skipping creation of {bundle_path} as it already exists. To overwrite, add the `--overwrite` argument.')
         return
 
     # Create bundle dir.
-    print(f'Creating folder {bundle_path}')
+    log.info(f'Creating folder {bundle_path}')
     Path(bundle_path).mkdir(parents=True, exist_ok=True)
 
     # Save citation file.
-    print(f'Saving citation to {cite_path}')
+    log.info(f'Saving citation to {cite_path}')
     db = BibDatabase()
     db.entries = [entry]
     writer = BibTexWriter()
     with open(cite_path, 'w', encoding='utf-8') as f:
         f.write(writer.write(db))
 
-    # Prepare TOML front matter for Markdown file.
-    frontmatter = ['+++']
-    frontmatter.append(f'title = "{clean_bibtex_str(entry["title"])}"')
-    if 'month' in entry:
-        frontmatter.append(f"date = {entry['year']}-{month2number(entry['month'])}-01")
-    else:
-        frontmatter.append(f"date = {entry['year']}-01-01")
+    # Prepare YAML front matter for Markdown file.
+    frontmatter = ['---']
+    frontmatter.append(f'title: "{clean_bibtex_str(entry["title"])}"')
+    year = ''
+    month = '01'
+    day = '01'
+    if 'date' in entry:
+        dateparts = entry['date'].split('-')
+        if len(dateparts) == 3:
+            year, month, day = dateparts[0], dateparts[1], dateparts[2]
+        elif len(dateparts) == 2:
+            year, month = dateparts[0], dateparts[1]
+        elif len(dateparts) == 1:
+            year = dateparts[0]
+    if 'month' in entry and month == '01':
+        month = month2number(entry['month'])
+    if 'year' in entry and year == '':
+        year = entry['year']
+    if len(year) == 0:
+        log.error(f'Invalid date for entry `{entry["ID"]}`.')
+    frontmatter.append(f"date: {year}-{month}-{day}")
+
+    frontmatter.append(f"publishDate: {timestamp}")
 
     authors = None
     if 'author' in entry:
@@ -135,43 +169,45 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
         authors = entry['editor']
     if authors:
         authors = clean_bibtex_authors([i.strip() for i in authors.replace('\n', ' ').split(' and ')])
-        frontmatter.append(f"authors = [{', '.join(authors)}]")
+        frontmatter.append(f"authors: [{', '.join(authors)}]")
 
-    frontmatter.append(f'publication_types = ["{PUB_TYPES.get(entry["ENTRYTYPE"], 0)}"]')
+    frontmatter.append(f'publication_types: ["{PUB_TYPES.get(entry["ENTRYTYPE"], 0)}"]')
 
     if 'abstract' in entry:
-        frontmatter.append(f'abstract = "{clean_bibtex_str(entry["abstract"])}"')
+        frontmatter.append(f'abstract: "{clean_bibtex_str(entry["abstract"])}"')
     else:
-        frontmatter.append('abstract = ""')
+        frontmatter.append('abstract: ""')
 
-    frontmatter.append(f'featured = {str(featured).lower()}')
+    frontmatter.append(f'featured: {str(featured).lower()}')
 
     # Publication name.
     if 'booktitle' in entry:
-        frontmatter.append(f'publication = "*{clean_bibtex_str(entry["booktitle"])}*"')
+        frontmatter.append(f'publication: "*{clean_bibtex_str(entry["booktitle"])}*"')
     elif 'journal' in entry:
-        frontmatter.append(f'publication = "*{clean_bibtex_str(entry["journal"])}*"')
+        frontmatter.append(f'publication: "*{clean_bibtex_str(entry["journal"])}*"')
+    elif 'publisher' in entry:
+        frontmatter.append(f'publication: "*{clean_bibtex_str(entry["publisher"])}*"')
     else:
-        frontmatter.append('publication = ""')
+        frontmatter.append('publication: ""')
 
     if 'keywords' in entry:
-        frontmatter.append(f'tags = [{clean_bibtex_tags(entry["keywords"], normalize)}]')
+        frontmatter.append(f'tags: [{clean_bibtex_tags(entry["keywords"], normalize)}]')
 
     if 'url' in entry:
-        frontmatter.append(f'url_pdf = "{clean_bibtex_str(entry["url"])}"')
+        frontmatter.append(f'url_pdf: "{clean_bibtex_str(entry["url"])}"')
 
     if 'doi' in entry:
-        frontmatter.append(f'doi = "{entry["doi"]}"')
+        frontmatter.append(f'doi: "{entry["doi"]}"')
 
-    frontmatter.append('+++\n\n')
+    frontmatter.append('---\n\n')
 
     # Save Markdown file.
     try:
-        print(f"Saving Markdown to '{markdown_path}'")
+        log.info(f"Saving Markdown to '{markdown_path}'")
         with open(markdown_path, 'w', encoding='utf-8') as f:
             f.write("\n".join(frontmatter))
     except IOError:
-        print('ERROR: could not save file.')
+        log.error('Could not save file.')
 
 
 def slugify(s, lower=True):
@@ -236,12 +272,15 @@ def clean_bibtex_tags(s, normalize=False):
 
 
 def month2number(month):
-    """Convert BibTeX month to numeric"""
-    month_abbr = month.strip()[:3].title()
-    try:
-        return str(list(calendar.month_abbr).index(month_abbr)).zfill(2)
-    except ValueError:
-        raise ValueError('Please update your BibTeX with valid months')
+    """Convert BibTeX or BibLateX month to numeric"""
+    if len(month) <= 2:  # Assume a 1 or 2 digit numeric month has been given.
+        return month.zfill(2)
+    else:  # Assume a textual month has been given.
+        month_abbr = month.strip()[:3].title()
+        try:
+            return str(list(calendar.month_abbr).index(month_abbr)).zfill(2)
+        except ValueError:
+            raise log.error('Please update the entry with a valid month.')
 
 
 def import_assets():
@@ -249,21 +288,21 @@ def import_assets():
 
     # Check that we are in an Academic website folder.
     if not Path('content').is_dir():
-        print('Please navigate to your website folder and re-run.')
+        log.error('Please navigate to your website folder and re-run.')
         return
 
     # Check compatibility with user's Academic version (v2.4.0+ required for local asset bundling)
     # `academic.toml` was added in Academic v2.4.0, so can simply check for the existence of that file.
     academic_filename = 'themes/academic/data/academic.toml'
     if not Path(academic_filename).is_file():
-        print('Could not detect Academic version in `themes/academic/data/academic.toml`. You may need to update Academic in order to use this tool.')
+        log.error('Could not detect Academic version in `themes/academic/data/academic.toml`. You may need to update Academic in order to use this tool.')
         return
 
     # Check assets file exists
     # Note that the order of assets in `assets.toml` matters since they will be concatenated in the order they appear.
     assets_filename = 'themes/academic/data/assets.toml'
     if not Path(assets_filename).is_file():
-        print('Could not detect assets file. You may need to update Academic in order to use this tool.')
+        log.error('Could not detect assets file. You may need to update Academic in order to use this tool.')
         return
 
     # Create output dirs if necessary
@@ -283,10 +322,10 @@ def import_assets():
             filepath = os.path.join(d, filename)
             js_files.append(filepath)
 
-            print(f'Downloading {filename} from {url}...')
+            log.info(f'Downloading {filename} from {url}...')
             download_file(url, filepath)
 
-        print(f'Merging JS assets into {JS_FILENAME}')
+        log.info(f'Merging JS assets into {JS_FILENAME}')
         merge_files(js_files, JS_FILENAME)
 
         # Parse CSS assets
@@ -304,10 +343,10 @@ def import_assets():
             filepath = os.path.join(d, filename)
             css_files.append(filepath)
 
-            print(f'Downloading {filename} from {url}...')
+            log.info(f'Downloading {filename} from {url}...')
             download_file(url, filepath)
 
-        print(f'Merging CSS assets into {CSS_FILENAME}')
+        log.info(f'Merging CSS assets into {CSS_FILENAME}')
         merge_files(css_files, CSS_FILENAME)
 
 
@@ -319,7 +358,7 @@ def download_file(url, file_name):
 
         # Check that we can access the specified URL OK.
         if response.status_code != 200:
-            print(f'ERROR could not download {url}')
+            log.error(f'Could not download {url}')
             return
 
         # Write to file.
