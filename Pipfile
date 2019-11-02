@@ -11,6 +11,7 @@ bibtexparser = "*"
 [dev-packages]
 pytest = "*"
 flake8 = "*"
+twine = "*"
 
 [requires]
 python_version = ">=3.6"
