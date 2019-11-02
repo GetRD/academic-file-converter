@@ -7,14 +7,11 @@ import re
 import argparse
 from argparse import RawTextHelpFormatter
 from pathlib import Path
-import toml
-from requests import get
-from urllib.parse import urlparse
-import tempfile
 import calendar
 import logging
 from datetime import datetime
 from academic import __version__ as version
+from academic.import_assets import import_assets
 
 import bibtexparser
 from bibtexparser.bparser import BibTexParser
@@ -22,8 +19,6 @@ from bibtexparser.bwriter import BibTexWriter
 from bibtexparser.bibdatabase import BibDatabase
 from bibtexparser.customization import convert_to_unicode
 
-JS_FILENAME = 'static/js/vendor/main.min.js'
-CSS_FILENAME = 'static/css/vendor/main.min.css'
 
 # Map BibTeX to Academic publication types.
 PUB_TYPES = {
@@ -43,12 +38,21 @@ PUB_TYPES = {
 }
 
 # Initialise logger.
-log = logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.WARNING, datefmt='%I:%M:%S%p')
-    
+logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.WARNING, datefmt='%I:%M:%S%p')
+log = logging.getLogger(__name__)
+
+
+class AcademicError(Exception):
+    pass
+
 
 def main():
+    parse_args(sys.argv[1:])  # Strip command name, leave just args.
+
+
+def parse_args(args):
     """Parse command-line arguments"""
-    
+
     # Initialise command parser.
     parser = argparse.ArgumentParser(
         description=f'Academic Admin Tool v{version}\nhttps://sourcethemes.com/academic/',
@@ -66,40 +70,42 @@ def main():
     parser_a.add_argument("--overwrite", action='store_true', help='Overwrite existing publications')
     parser_a.add_argument("--normalize", action='store_true', help='Normalize each keyword to lowercase with uppercase first letter')
     parser_a.add_argument("-v", "--verbose", action='store_true', required=False, help='Verbose mode')
+    parser_a.add_argument("-dr", "--dry-run", action='store_true', required=False, help='Perform a dry run (Bibtex only)')
 
-    args, unknown = parser.parse_known_args()
+    known_args, unknown = parser.parse_known_args(args)
 
     # If no arguments, show help.
-    if len(sys.argv[1:]) == 0:
+    if len(args) == 0:
         parser.print_help()
         parser.exit()
 
     # If no known arguments, wrap Hugo command.
-    elif args is None and unknown:
+    elif known_args is None and unknown:
         cmd = []
         cmd.append('hugo')
-        if sys.argv[1:]:
-            cmd.append(sys.argv[1:])
+        if args:
+            cmd.append(args)
         subprocess.call(cmd)
     else:
         # The command has been recognised, proceed to parse it.
-        if args.command and args.verbose:
+        if known_args.command and known_args.verbose:
             # Set logging level to debug if verbose mode activated.
             logging.getLogger().setLevel(logging.DEBUG)
-        if args.command and args.assets:
+        if known_args.command and known_args.assets:
             # Run command to import assets.
             import_assets()
-        elif args.command and args.bibtex:
+        elif known_args.command and known_args.bibtex:
             # Run command to import bibtex.
-            import_bibtex(args.bibtex, pub_dir=args.publication_dir, featured=args.featured, overwrite=args.overwrite, normalize=args.normalize)
+            import_bibtex(known_args.bibtex, pub_dir=known_args.publication_dir, featured=known_args.featured, overwrite=known_args.overwrite, normalize=known_args.normalize, dry_run=known_args.dry_run)
 
-def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False, normalize=False):
+def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False, normalize=False, dry_run=False):
     """Import publications from BibTeX file"""
 
     # Check BibTeX file exists.
     if not Path(bibtex).is_file():
-        log.error('Please check the path to your BibTeX file and re-run.')
-        return
+        err = 'Please check the path to your BibTeX file and re-run'
+        log.error(err)
+        raise AcademicError(err)
 
     # Load BibTeX file for parsing.
     with open(bibtex, 'r', encoding='utf-8') as bibtex_file:
@@ -108,10 +114,10 @@ def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False
         parser.ignore_nonstandard_types = False
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
-            parse_bibtex_entry(entry, pub_dir=pub_dir, featured=featured, overwrite=overwrite, normalize=normalize)
+            parse_bibtex_entry(entry, pub_dir=pub_dir, featured=featured, overwrite=overwrite, normalize=normalize, dry_run=dry_run)
 
 
-def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=False, normalize=False):
+def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=False, normalize=False, dry_run=False):
     """Parse a bibtex entry and generate corresponding publication bundle"""
     log.info(f"Parsing entry {entry['ID']}")
 
@@ -128,15 +134,17 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
 
     # Create bundle dir.
     log.info(f'Creating folder {bundle_path}')
-    Path(bundle_path).mkdir(parents=True, exist_ok=True)
+    if not dry_run:
+        Path(bundle_path).mkdir(parents=True, exist_ok=True)
 
     # Save citation file.
     log.info(f'Saving citation to {cite_path}')
     db = BibDatabase()
     db.entries = [entry]
     writer = BibTexWriter()
-    with open(cite_path, 'w', encoding='utf-8') as f:
-        f.write(writer.write(db))
+    if not dry_run:
+        with open(cite_path, 'w', encoding='utf-8') as f:
+            f.write(writer.write(db))
 
     # Prepare YAML front matter for Markdown file.
     frontmatter = ['---']
@@ -204,8 +212,9 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     # Save Markdown file.
     try:
         log.info(f"Saving Markdown to '{markdown_path}'")
-        with open(markdown_path, 'w', encoding='utf-8') as f:
-            f.write("\n".join(frontmatter))
+        if not dry_run:
+            with open(markdown_path, 'w', encoding='utf-8') as f:
+                f.write("\n".join(frontmatter))
     except IOError:
         log.error('Could not save file.')
 
@@ -221,7 +230,7 @@ def slugify(s, lower=True):
     s = re.sub(r'(\d+)(\D+)', r'\1\-\2', s)  # Delimit number, non-number.
     s = re.sub(r'((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))', r'\-\1', s)  # Delimit camelcase.
     s = ''.join(c for c in s if c.isalnum() or c in good_symbols).strip()  # Strip non-alphanumeric and non-hyphen.
-    s = re.sub('\-+', '-', s)  # Remove consecutive hyphens.
+    s = re.sub('-{2,}', '-', s)  # Remove consecutive hyphens.
 
     if lower:
         s = s.lower()
@@ -281,96 +290,6 @@ def month2number(month):
             return str(list(calendar.month_abbr).index(month_abbr)).zfill(2)
         except ValueError:
             raise log.error('Please update the entry with a valid month.')
-
-
-def import_assets():
-    """Download and import third-party JS and CSS assets to enable offline sites"""
-
-    # Check that we are in an Academic website folder.
-    if not Path('content').is_dir():
-        log.error('Please navigate to your website folder and re-run.')
-        return
-
-    # Check compatibility with user's Academic version (v2.4.0+ required for local asset bundling)
-    # `academic.toml` was added in Academic v2.4.0, so can simply check for the existence of that file.
-    academic_filename = 'themes/academic/data/academic.toml'
-    if not Path(academic_filename).is_file():
-        log.error('Could not detect Academic version in `themes/academic/data/academic.toml`. You may need to update Academic in order to use this tool.')
-        return
-
-    # Check assets file exists
-    # Note that the order of assets in `assets.toml` matters since they will be concatenated in the order they appear.
-    assets_filename = 'themes/academic/data/assets.toml'
-    if not Path(assets_filename).is_file():
-        log.error('Could not detect assets file. You may need to update Academic in order to use this tool.')
-        return
-
-    # Create output dirs if necessary
-    Path(JS_FILENAME).parent.mkdir(parents=True, exist_ok=True)
-    Path(CSS_FILENAME).parent.mkdir(parents=True, exist_ok=True)
-
-    # Parse TOML file which lists assets
-    parsed_toml = toml.load(assets_filename)
-
-    # Create temporary directory for downloaded assets.
-    with tempfile.TemporaryDirectory() as d:
-        # Parse JS assets
-        js_files = []
-        for i, j in parsed_toml['js'].items():
-            url = j['url'].replace('%s', j['version'], 1)  # Replace placeholder with asset version.
-            filename = os.path.basename(urlparse(url).path)
-            filepath = os.path.join(d, filename)
-            js_files.append(filepath)
-
-            log.info(f'Downloading {filename} from {url}...')
-            download_file(url, filepath)
-
-        log.info(f'Merging JS assets into {JS_FILENAME}')
-        merge_files(js_files, JS_FILENAME)
-
-        # Parse CSS assets
-        css_files = []
-        for i, j in parsed_toml['css'].items():
-            url = j['url'].replace('%s', j['version'], 1)  # Replace placeholder with asset version.
-
-            # Special case for highlight.js style
-            if i == 'highlight':
-                # Assume user is using a light theme.
-                # TODO: Set to .Site.Params.highlight_style if set, or dracula if using a dark theme.
-                hl_theme = 'github'
-                url = url.replace('%s', hl_theme)  # Replace the second placeholder with style name.
-            filename = os.path.basename(urlparse(url).path)
-            filepath = os.path.join(d, filename)
-            css_files.append(filepath)
-
-            log.info(f'Downloading {filename} from {url}...')
-            download_file(url, filepath)
-
-        log.info(f'Merging CSS assets into {CSS_FILENAME}')
-        merge_files(css_files, CSS_FILENAME)
-
-
-def download_file(url, file_name):
-    """Download file from URL"""
-    with open(file_name, 'wb') as file:
-        # Get file at URL.
-        response = get(url)
-
-        # Check that we can access the specified URL OK.
-        if response.status_code != 200:
-            log.error(f'Could not download {url}')
-            return
-
-        # Write to file.
-        file.write(response.content)
-
-
-def merge_files(file_path_list, destination):
-    """Merge multiple files into one file"""
-    with open(destination, 'w', encoding='utf-8') as f:
-        for file_path in file_path_list:
-            with open(file_path, 'r', encoding='utf-8') as source_file:
-                f.write(source_file.read() + '\n')
 
 
 if __name__ == '__main__':
