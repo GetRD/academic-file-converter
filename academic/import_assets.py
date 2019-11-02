@@ -25,7 +25,8 @@ def import_assets():
     # `academic.toml` was added in Academic v2.4.0, so can simply check for the existence of that file.
     academic_filename = 'themes/academic/data/academic.toml'
     if not Path(academic_filename).is_file():
-        log.error('Could not detect Academic version in `themes/academic/data/academic.toml`. You may need to update Academic in order to use this tool.')
+        log.error('Could not detect Academic version in `themes/academic/data/academic.toml`. '
+                  'You may need to update Academic in order to use this tool.')
         return
 
     # Check assets file exists

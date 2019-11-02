@@ -68,9 +68,14 @@ def parse_args(args):
                           help='Directory that your publications are stored in (default `publication`)')
     parser_a.add_argument("--featured", action='store_true', help='Flag publications as featured')
     parser_a.add_argument("--overwrite", action='store_true', help='Overwrite existing publications')
-    parser_a.add_argument("--normalize", action='store_true', help='Normalize each keyword to lowercase with uppercase first letter')
+    parser_a.add_argument("--normalize",
+                          action='store_true',
+                          help='Normalize each keyword to lowercase with uppercase first letter')
     parser_a.add_argument("-v", "--verbose", action='store_true', required=False, help='Verbose mode')
-    parser_a.add_argument("-dr", "--dry-run", action='store_true', required=False, help='Perform a dry run (Bibtex only)')
+    parser_a.add_argument("-dr", "--dry-run",
+                          action='store_true',
+                          required=False,
+                          help='Perform a dry run (Bibtex only)')
 
     known_args, unknown = parser.parse_known_args(args)
 
@@ -96,7 +101,13 @@ def parse_args(args):
             import_assets()
         elif known_args.command and known_args.bibtex:
             # Run command to import bibtex.
-            import_bibtex(known_args.bibtex, pub_dir=known_args.publication_dir, featured=known_args.featured, overwrite=known_args.overwrite, normalize=known_args.normalize, dry_run=known_args.dry_run)
+            import_bibtex(known_args.bibtex,
+                          pub_dir=known_args.publication_dir,
+                          featured=known_args.featured,
+                          overwrite=known_args.overwrite,
+                          normalize=known_args.normalize,
+                          dry_run=known_args.dry_run)
+
 
 def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False, normalize=False, dry_run=False):
     """Import publications from BibTeX file"""
@@ -114,7 +125,12 @@ def import_bibtex(bibtex, pub_dir='publication', featured=False, overwrite=False
         parser.ignore_nonstandard_types = False
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
-            parse_bibtex_entry(entry, pub_dir=pub_dir, featured=featured, overwrite=overwrite, normalize=normalize, dry_run=dry_run)
+            parse_bibtex_entry(entry,
+                               pub_dir=pub_dir,
+                               featured=featured,
+                               overwrite=overwrite,
+                               normalize=normalize,
+                               dry_run=dry_run)
 
 
 def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=False, normalize=False, dry_run=False):
@@ -129,7 +145,8 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
 
     # Do not overwrite publication bundle if it already exists.
     if not overwrite and os.path.isdir(bundle_path):
-        log.warning(f'Skipping creation of {bundle_path} as it already exists. To overwrite, add the `--overwrite` argument.')
+        log.warning(f'Skipping creation of {bundle_path} as it already exists. '
+                    f'To overwrite, add the `--overwrite` argument.')
         return
 
     # Create bundle dir.
