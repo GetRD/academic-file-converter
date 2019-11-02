@@ -12,6 +12,4 @@ bibtexparser = "*"
 pytest = "*"
 flake8 = "*"
 twine = "*"
-
-[requires]
-python_version = ">=3.6"
+black = "==19.10b0"

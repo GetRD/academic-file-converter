@@ -1,0 +1,2 @@
+[tool.black]
+line-length = 150  # Match Flake8 setting.
