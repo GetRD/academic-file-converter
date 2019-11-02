@@ -1,2 +1,5 @@
-__version__ = '0.5.0'
+from academic import version
+
+
+__version__ = version.version
 __author__ = 'George Cushen'
