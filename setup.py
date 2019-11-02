@@ -45,7 +45,7 @@ setup(
     keywords='cli academic hugo theme static-site-generator cms blog-engine github-pages netlify hugo-theme documentation-generator',
     include_package_data=True,
     license='MIT',
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests']),
     python_requires='>=3.6',
     install_requires=['toml', 'requests', 'bibtexparser'],
     entry_points="""
