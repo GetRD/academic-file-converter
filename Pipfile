@@ -6,7 +6,7 @@ verify_ssl = true
 [packages]
 toml = "*"
 requests = "*"
-bibtexparser = "*"
+bibtexparser = "==1.1.0"
 
 [dev-packages]
 pytest = "*"

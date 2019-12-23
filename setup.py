@@ -47,7 +47,7 @@ setup(
     license='MIT',
     packages=find_packages(exclude=['tests']),
     python_requires='>=3.6',
-    install_requires=['toml', 'requests', 'bibtexparser'],
+    install_requires=['toml', 'requests', 'bibtexparser==1.1.0'],
     entry_points="""
         [console_scripts]
         academic=academic.cli:main
