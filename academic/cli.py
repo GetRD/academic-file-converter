@@ -19,7 +19,6 @@ from bibtexparser.bwriter import BibTexWriter
 from bibtexparser.bibdatabase import BibDatabase
 from bibtexparser.customization import convert_to_unicode
 
-
 # Map BibTeX to Academic publication types.
 PUB_TYPES = {
     "article": 2,
@@ -35,6 +34,68 @@ PUB_TYPES = {
     "techreport": 4,
     "unpublished": 3,
     "patent": 8,
+}
+
+# Map BibLaTeX to Academic publication types.
+# See https://github.com/zotero/translators/blob/master/BibLaTeX.js
+# NOTE: This will require changes in the following to fully support:
+# - the language packs in the local i18n folder (not in the theme folder)
+# - the local data/publication_types.toml (not in the theme folder)
+
+BIBLATEX_PUB_TYPES = {
+    "article": 2,
+    "artwork": 11,
+    "audio": 16,
+    "audiorecording": 16,
+    "bill": 14,
+    "blogPost": 12,
+    "book": 5,
+    "bookSection": 6,
+    "case": 15,
+    "computerProgram": 18,
+    "conferencePaper": 1,
+    "dictionaryEntry": 19,
+    "document": 0,
+    "email": 9,
+    "encyclopediaArticle": 19,
+    "film": 10,
+    "forumPost": 12,
+    "hearing": 15,
+    "inbook": 6,
+    "incollection": 6,
+    "inproceedings": 1,
+    "inreference": 19,
+    "instantMessage": 0,
+    "interview": 0,
+    "journalArticle": 2,
+    "jurisdiction": 15,
+    "legislation": 14,
+    "letter": 9,
+    "magazineArticle": 2,
+    "manual": 4,
+    "manuscript": 3,
+    "map": 0,
+    "mastersthesis": 7,
+    "misc": 0,
+    "movie": 10,
+    "newspaperArticle": 2,
+    "online": 12,
+    "patent": 8,
+    "phdthesis": 7,
+    "podcast": 16,
+    "presentation": 3,
+    "proceedings": 0,
+    "radioBroadcast": 0,
+    "report": 13,
+    "software": 18,
+    "statute": 14,
+    "techreport": 4,
+    "thesis": 7,
+    "tvBroadcast": 0,
+    "unpublished": 3,
+    "video": 17,
+    "videoRecording": 17,
+    "webpage": 12
 }
 
 # Initialise logger.
@@ -63,6 +124,7 @@ def parse_args(args):
     parser_a = subparsers.add_parser("import", help="Import data into Academic")
     parser_a.add_argument("--assets", action="store_true", help="Import third-party JS and CSS for generating an offline site")
     parser_a.add_argument("--bibtex", required=False, type=str, help="File path to your BibTeX file")
+    parser_a.add_argument("--biblatex", required=False, type=str, help="File path to your BibLaTeX file")
     parser_a.add_argument(
         "--publication-dir",
         required=False,
@@ -73,9 +135,10 @@ def parse_args(args):
     parser_a.add_argument("--featured", action="store_true", help="Flag publications as featured")
     parser_a.add_argument("--overwrite", action="store_true", help="Overwrite existing publications")
     parser_a.add_argument("--normalize", action="store_true", help="Normalize each keyword to lowercase with uppercase first letter")
+    parser_a.add_argument("--date-title-folders", action="store_true", help="Create folders for imported publications named by date and title")
+    parser_a.add_argument("--title-folders", action="store_true", help="Create folders for imported publications named by title")
     parser_a.add_argument("-v", "--verbose", action="store_true", required=False, help="Verbose mode")
     parser_a.add_argument("-dr", "--dry-run", action="store_true", required=False, help="Perform a dry run (Bibtex only)")
-
     known_args, unknown = parser.parse_known_args(args)
 
     # If no arguments, show help.
@@ -98,6 +161,14 @@ def parse_args(args):
         if known_args.command and known_args.assets:
             # Run command to import assets.
             import_assets()
+        elif known_args.command and known_args.bibtex and known_args.biblatex:
+            err = "cannot specify both --bibtex and --biblatex"
+            log.error(err)
+            raise AcademicError(err)
+        elif known_args.command and known_args.date_title_folders and known_args.title_folders:
+            err = "cannot specify both --date-title-folders and --title-folders"
+            log.error(err)
+            raise AcademicError(err)
         elif known_args.command and known_args.bibtex:
             # Run command to import bibtex.
             import_bibtex(
@@ -107,10 +178,35 @@ def parse_args(args):
                 overwrite=known_args.overwrite,
                 normalize=known_args.normalize,
                 dry_run=known_args.dry_run,
+                date_title_folders=known_args.date_title_folders,
+                title_folders=known_args.title_folders,
+                use_biblatex=False
+            )
+        elif known_args.command and known_args.biblatex:
+            # Run command to import biblatex.
+            import_bibtex(
+                known_args.biblatex,
+                pub_dir=known_args.publication_dir,
+                featured=known_args.featured,
+                overwrite=known_args.overwrite,
+                normalize=known_args.normalize,
+                dry_run=known_args.dry_run,
+                date_title_folders=known_args.date_title_folders,
+                title_folders=known_args.title_folders,
+                use_biblatex=True
             )
 
-
-def import_bibtex(bibtex, pub_dir="publication", featured=False, overwrite=False, normalize=False, dry_run=False):
+def import_bibtex(
+    bibtex,
+    pub_dir="publication",
+    featured=False,
+    overwrite=False,
+    normalize=False,
+    dry_run=False,
+    date_title_folders=False,
+    title_folders=False,
+    use_biblatex=False
+):
     """Import publications from BibTeX file"""
 
     # Check BibTeX file exists.
@@ -126,41 +222,42 @@ def import_bibtex(bibtex, pub_dir="publication", featured=False, overwrite=False
         parser.ignore_nonstandard_types = False
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
-            parse_bibtex_entry(entry, pub_dir=pub_dir, featured=featured, overwrite=overwrite, normalize=normalize, dry_run=dry_run)
+            parse_bibtex_entry(
+                entry,
+                pub_dir=pub_dir,
+                featured=featured,
+                overwrite=overwrite,
+                normalize=normalize,
+                dry_run=dry_run,
+                date_title_folders=date_title_folders,
+                title_folders=title_folders,
+                use_biblatex=use_biblatex
+            )
 
 
-def parse_bibtex_entry(entry, pub_dir="publication", featured=False, overwrite=False, normalize=False, dry_run=False):
+# Move date-related logic to the beginning so that date value is
+# available for generating folder name.
+#
+# Truncate title to 68 characters in folder name to keep overall
+# filename limit to 79 characters which includes the date.
+#
+# Accept use_biblatex flag to determine whether to validate tyoes
+# against BibLaTex list.
+
+def parse_bibtex_entry(
+    entry,
+    pub_dir="publication",
+    featured=False,
+    overwrite=False,
+    normalize=False,
+    dry_run=False,
+    date_title_folders=False,
+    title_folders=False,
+    use_biblatex=False
+):
     """Parse a bibtex entry and generate corresponding publication bundle"""
     log.info(f"Parsing entry {entry['ID']}")
 
-    bundle_path = f"content/{pub_dir}/{slugify(entry['ID'])}"
-    markdown_path = os.path.join(bundle_path, "index.md")
-    cite_path = os.path.join(bundle_path, "cite.bib")
-    date = datetime.utcnow()
-    timestamp = date.isoformat("T") + "Z"  # RFC 3339 timestamp.
-
-    # Do not overwrite publication bundle if it already exists.
-    if not overwrite and os.path.isdir(bundle_path):
-        log.warning(f"Skipping creation of {bundle_path} as it already exists. " f"To overwrite, add the `--overwrite` argument.")
-        return
-
-    # Create bundle dir.
-    log.info(f"Creating folder {bundle_path}")
-    if not dry_run:
-        Path(bundle_path).mkdir(parents=True, exist_ok=True)
-
-    # Save citation file.
-    log.info(f"Saving citation to {cite_path}")
-    db = BibDatabase()
-    db.entries = [entry]
-    writer = BibTexWriter()
-    if not dry_run:
-        with open(cite_path, "w", encoding="utf-8") as f:
-            f.write(writer.write(db))
-
-    # Prepare YAML front matter for Markdown file.
-    frontmatter = ["---"]
-    frontmatter.append(f'title: "{clean_bibtex_str(entry["title"])}"')
     year = ""
     month = "01"
     day = "01"
@@ -178,6 +275,45 @@ def parse_bibtex_entry(entry, pub_dir="publication", featured=False, overwrite=F
         year = entry["year"]
     if len(year) == 0:
         log.error(f'Invalid date for entry `{entry["ID"]}`.')
+
+    title = entry["title"].strip()
+    if date_title_folders and "title" in entry and title:
+        file_name = f"{year}-{month}-{day}-{title:.68}"
+    elif title_folders and "title" in entry and title:
+        file_name = f"{title:.79}"
+    else:
+        file_name = entry["ID"]
+        
+    bundle_path = f"content/{pub_dir}/{slugify(file_name)}"
+    markdown_path = os.path.join(bundle_path, "index.md")
+    cite_path = os.path.join(bundle_path, "cite.bib")
+    date = datetime.utcnow()
+    timestamp = date.isoformat("T") + "Z"  # RFC 3339 timestamp.
+
+    # Do not overwrite publication bundle if it already exists.
+    if not overwrite and os.path.isdir(bundle_path):
+        log.warning(f"Skipping creation of {bundle_path} as it already exists. " f"To overwrite, add the `--overwrite` argument.")
+        return
+
+    # Create bundle dir.
+    log.info(f"Creating folder {bundle_path}")
+    if not dry_run:
+        Path(bundle_path).mkdir(parents=True, exist_ok=True)
+    else:
+        print(bundle_path)
+
+    # Save citation file.
+    log.info(f"Saving citation to {cite_path}")
+    db = BibDatabase()
+    db.entries = [entry]
+    writer = BibTexWriter()
+    if not dry_run:
+        with open(cite_path, "w", encoding="utf-8") as f:
+            f.write(writer.write(db))
+
+    # Prepare YAML front matter for Markdown file.
+    frontmatter = ["---"]
+    frontmatter.append(f'title: "{clean_bibtex_str(entry["title"])}"')
     frontmatter.append(f"date: {year}-{month}-{day}")
 
     frontmatter.append(f"publishDate: {timestamp}")
@@ -191,7 +327,10 @@ def parse_bibtex_entry(entry, pub_dir="publication", featured=False, overwrite=F
         authors = clean_bibtex_authors([i.strip() for i in authors.replace("\n", " ").split(" and ")])
         frontmatter.append(f"authors: [{', '.join(authors)}]")
 
-    frontmatter.append(f'publication_types: ["{PUB_TYPES.get(entry["ENTRYTYPE"], 0)}"]')
+    if use_biblatex:
+        frontmatter.append(f'publication_types: ["{BIBLATEX_PUB_TYPES.get(entry["ENTRYTYPE"], 0)}"]')
+    else:
+        frontmatter.append(f'publication_types: ["{PUB_TYPES.get(entry["ENTRYTYPE"], 0)}"]')
 
     if "abstract" in entry:
         frontmatter.append(f'abstract: "{clean_bibtex_str(entry["abstract"])}"')
@@ -231,8 +370,13 @@ def parse_bibtex_entry(entry, pub_dir="publication", featured=False, overwrite=F
         log.error("Could not save file.")
 
 
+# Add the space character to bad_symbols so that spaces are replaced by
+# hyphens when the "--date-title-folders" argument is used.
+#
+# Remove trailing hyphen.
+
 def slugify(s, lower=True):
-    bad_symbols = (".", "_", ":")  # Symbols to replace with hyphen delimiter.
+    bad_symbols = (".", "_", ":", " ")  # Symbols to replace with hyphen delimiter.
     delimiter = "-"
     good_symbols = (delimiter,)  # Symbols to keep.
     for r in bad_symbols:
@@ -243,6 +387,7 @@ def slugify(s, lower=True):
     s = re.sub(r"((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))", r"\-\1", s)  # Delimit camelcase.
     s = "".join(c for c in s if c.isalnum() or c in good_symbols).strip()  # Strip non-alphanumeric and non-hyphen.
     s = re.sub("-{2,}", "-", s)  # Remove consecutive hyphens.
+    s = re.sub("-$", "", s) # Remove trailing hyphen.
 
     if lower:
         s = s.lower()
