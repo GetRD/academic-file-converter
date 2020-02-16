@@ -70,20 +70,14 @@ def import_assets():
             tempdir = os.path.join(d, i)
             os.makedirs(tempdir, exist_ok=True)
 
-            url = j["url"].replace("%s", j["version"], 1)  # Replace placeholder with asset version.
-
-            # Special case for highlight.js style
-            if i == "highlight":
-                # Assume user is using a light theme.
-                # TODO: Set to .Site.Params.highlight_style if set, or dracula if using a dark theme.
-                hl_theme = "github"
-                url = url.replace("%s", hl_theme)  # Replace the second placeholder with style name.
-            filename = os.path.basename(urlparse(url).path)
-            filepath = os.path.join(tempdir, filename)
-            css_files.append(filepath)
-
-            log.info(f"Downloading {filename} from {url}...")
-            download_file(url, filepath)
+            if i == "fontAwesome":
+                css_files += import_fontawesome(tempdir, j)
+            elif i == "academicons":
+                css_files += import_academicons(tempdir, j)
+            elif i == "highlight":
+                css_files += import_highlight(tempdir, j)
+            else:
+                css_files += import_generic(tempdir, j)
 
         log.info(f"Merging CSS assets into {CSS_FILENAME}")
         merge_files(css_files, CSS_FILENAME)
@@ -114,6 +108,75 @@ def import_mathjax(tempdir, metadata):
 
 def import_generic(tempdir, metadata):
     url = metadata["url"].replace("%s", metadata["version"])
+    filename = os.path.basename(urlparse(url).path)
+    filepath = os.path.join(tempdir, filename)
+
+    log.info(f"Downloading {filename} from {url}...")
+    download_file(url, filepath)
+
+    return [filepath]
+
+
+def import_fontawesome(tempdir, metadata):
+    url = metadata["download_url"].replace("%s", metadata["version"])
+    filename = os.path.basename(urlparse(url).path)
+    filepath = os.path.join(tempdir, filename)
+
+    log.info(f"Downloading {filename} from {url}...")
+    download_file(url, filepath)
+    unzip_path = os.path.join(tempdir, "unzip")
+    with zipfile.ZipFile(filepath, 'r') as zip_ref:
+        zip_ref.extractall(unzip_path)
+
+    # github puts all files in a folder that is named after the commit
+    elements = os.listdir(unzip_path)
+    assert len(elements) == 1
+    unzip_path = os.path.join(unzip_path, elements[0])
+    assert os.path.isdir(unzip_path)
+
+    # to keep the folder structure clean, we move the fonts from "webfonts" to "fonts"
+    font_path = os.path.join(unzip_path, "webfonts")
+    merge_dir(font_path, os.path.join(VENDOR_PATH, "fonts"))
+
+    css_in = os.path.join(unzip_path, "css", "all.min.css") 
+    css_out = os.path.join(tempdir, "rewritten.css")
+    with open(css_in, "rt") as fin, open(css_out, "wt") as fout:
+        for line in fin:
+            fout.write(line.replace("/webfonts/", "/fonts/"))
+    return [css_out]
+
+
+def import_academicons(tempdir, metadata):
+    url = metadata["download_url"].replace("%s", metadata["version"])
+    filename = os.path.basename(urlparse(url).path)
+    filepath = os.path.join(tempdir, filename)
+
+    log.info(f"Downloading {filename} from {url}...")
+    download_file(url, filepath)
+    unzip_path = os.path.join(tempdir, "unzip")
+    with zipfile.ZipFile(filepath, 'r') as zip_ref:
+        zip_ref.extractall(unzip_path)
+
+    # github puts all files in a folder that is named after the commit
+    elements = os.listdir(unzip_path)
+    assert len(elements) == 1
+    unzip_path = os.path.join(unzip_path, elements[0])
+    assert os.path.isdir(unzip_path)
+
+    font_path = os.path.join(unzip_path, "fonts")
+    merge_dir(font_path, os.path.join(VENDOR_PATH, "fonts"))
+
+    css_path = os.path.join(unzip_path, "css", "academicons.min.css") 
+    return [css_path]
+
+
+def import_highlight(tempdir, metadata):
+    # Replace *first* placeholder with asset version, the other is for the theme
+    url = metadata["url"].replace("%s", metadata["version"], 1)  
+    # Assume user is using a light theme.
+    # TODO: Set to .Site.Params.highlight_style if set, or dracula if using a dark theme.
+    hl_theme = "github"
+    url = url.replace("%s", hl_theme)  # Replace the second placeholder with style name.
     filename = os.path.basename(urlparse(url).path)
     filepath = os.path.join(tempdir, filename)
 
