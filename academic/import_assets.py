@@ -5,10 +5,14 @@ import logging
 import os
 import toml
 from requests import get
+import shutil
+import zipfile
 
 
-JS_FILENAME = "static/vendor/js/main.min.js"
-CSS_FILENAME = "static/vendor/css/main.min.css"
+VENDOR_PATH = "static/vendor"
+JS_FILENAME = os.path.join(VENDOR_PATH, "js/main.min.js")
+MATHJAX_PATH = os.path.join(VENDOR_PATH, "js/mathJax")
+CSS_FILENAME = os.path.join(VENDOR_PATH, "css/main.min.css")
 
 log = logging.getLogger(__name__)
 
@@ -49,13 +53,13 @@ def import_assets():
         # Parse JS assets
         js_files = []
         for i, j in parsed_toml["js"].items():
-            url = j["url"].replace("%s", j["version"], 1)  # Replace placeholder with asset version.
-            filename = os.path.basename(urlparse(url).path)
-            filepath = os.path.join(d, filename)
-            js_files.append(filepath)
+            tempdir = os.path.join(d, i)
+            os.makedirs(tempdir, exist_ok=True)
 
-            log.info(f"Downloading {filename} from {url}...")
-            download_file(url, filepath)
+            if i == "mathJax":
+                js_files += import_mathjax(tempdir, j)
+            else:
+                js_files += import_generic(tempdir, j)
 
         log.info(f"Merging JS assets into {JS_FILENAME}")
         merge_files(js_files, JS_FILENAME)
@@ -63,6 +67,9 @@ def import_assets():
         # Parse CSS assets
         css_files = []
         for i, j in parsed_toml["css"].items():
+            tempdir = os.path.join(d, i)
+            os.makedirs(tempdir, exist_ok=True)
+
             url = j["url"].replace("%s", j["version"], 1)  # Replace placeholder with asset version.
 
             # Special case for highlight.js style
@@ -72,7 +79,7 @@ def import_assets():
                 hl_theme = "github"
                 url = url.replace("%s", hl_theme)  # Replace the second placeholder with style name.
             filename = os.path.basename(urlparse(url).path)
-            filepath = os.path.join(d, filename)
+            filepath = os.path.join(tempdir, filename)
             css_files.append(filepath)
 
             log.info(f"Downloading {filename} from {url}...")
@@ -80,6 +87,40 @@ def import_assets():
 
         log.info(f"Merging CSS assets into {CSS_FILENAME}")
         merge_files(css_files, CSS_FILENAME)
+
+
+def import_mathjax(tempdir, metadata):
+    url = metadata["download_url"]
+    filename = os.path.basename(urlparse(url).path)
+    filepath = os.path.join(tempdir, filename)
+
+    log.info(f"Downloading {filename} from {url}...")
+    download_file(url, filepath)
+    unzip_path = os.path.join(tempdir, "unzip")
+    with zipfile.ZipFile(filepath, 'r') as zip_ref:
+        zip_ref.extractall(unzip_path)
+
+    # github puts all files in a folder that is named after the commit
+    elements = os.listdir(unzip_path)
+    assert len(elements) == 1
+    unzip_path = os.path.join(unzip_path, elements[0])
+    assert os.path.isdir(unzip_path)
+
+    src_path = os.path.join(unzip_path, "es5")
+    merge_dir(src_path, MATHJAX_PATH)
+
+    return [] # no js files to be concatenated
+
+
+def import_generic(tempdir, metadata):
+    url = metadata["url"].replace("%s", metadata["version"])
+    filename = os.path.basename(urlparse(url).path)
+    filepath = os.path.join(tempdir, filename)
+
+    log.info(f"Downloading {filename} from {url}...")
+    download_file(url, filepath)
+
+    return [filepath]
 
 
 def download_file(url, file_name):
@@ -103,3 +144,16 @@ def merge_files(file_path_list, destination):
         for file_path in file_path_list:
             with open(file_path, "r", encoding="utf-8") as source_file:
                 f.write(source_file.read() + "\n")
+
+
+def merge_dir(src_dir, target_dir):
+    """Merge source directory into target directory"""
+    os.makedirs(target_dir, exist_ok=True)
+    for root, dirs, files in os.walk(src_dir, followlinks=False):
+        relroot = os.path.relpath(root, src_dir)
+        for d in dirs:
+            os.makedirs(os.path.join(target_dir, relroot, d), exist_ok=False)
+        for f in files:
+            src_file = os.path.join(src_dir, relroot, f)
+            target_file = os.path.join(target_dir, relroot, f)
+            shutil.copy2(src_file, target_file, follow_symlinks=False)
