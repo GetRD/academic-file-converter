@@ -7,8 +7,8 @@ import toml
 from requests import get
 
 
-JS_FILENAME = "static/js/vendor/main.min.js"
-CSS_FILENAME = "static/css/vendor/main.min.css"
+JS_FILENAME = "static/vendor/js/main.min.js"
+CSS_FILENAME = "static/vendor/css/main.min.css"
 
 log = logging.getLogger(__name__)
 
