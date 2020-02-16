@@ -41,23 +41,33 @@ def import_assets():
         log.error("Could not detect assets file. You may need to update Academic in order to use this tool.")
         return
 
+    params_filename = "config/_default/params.toml"
+    if not Path(params_filename).is_file():
+        log.error("Could not detect params.toml file.")
+        return
+
     # Create output dirs if necessary
     Path(JS_FILENAME).parent.mkdir(parents=True, exist_ok=True)
     Path(CSS_FILENAME).parent.mkdir(parents=True, exist_ok=True)
 
     # Parse TOML file which lists assets
-    parsed_toml = toml.load(assets_filename)
+    assets_toml = toml.load(assets_filename)
+
+    # Parse TOML file which contains hugo/academic parameters
+    params_toml = toml.load(params_filename)
 
     # Create temporary directory for downloaded assets.
     with tempfile.TemporaryDirectory() as d:
         # Parse JS assets
         js_files = []
-        for i, j in parsed_toml["js"].items():
+        for i, j in assets_toml["js"].items():
             tempdir = os.path.join(d, i)
             os.makedirs(tempdir, exist_ok=True)
 
             if i == "mathJax":
                 js_files += import_mathjax(tempdir, j)
+            elif i == "highlight":
+                js_files += import_highlight_js(tempdir, j, params_toml)
             else:
                 js_files += import_generic(tempdir, j)
 
@@ -66,7 +76,7 @@ def import_assets():
 
         # Parse CSS assets
         css_files = []
-        for i, j in parsed_toml["css"].items():
+        for i, j in assets_toml["css"].items():
             tempdir = os.path.join(d, i)
             os.makedirs(tempdir, exist_ok=True)
 
@@ -75,7 +85,7 @@ def import_assets():
             elif i == "academicons":
                 css_files += import_academicons(tempdir, j)
             elif i == "highlight":
-                css_files += import_highlight(tempdir, j)
+                css_files += import_highlight_css(tempdir, j, params_toml)
             else:
                 css_files += import_generic(tempdir, j)
 
@@ -104,6 +114,32 @@ def import_mathjax(tempdir, metadata):
     merge_dir(src_path, MATHJAX_PATH)
 
     return [] # no js files to be concatenated
+
+
+def import_highlight_js(tempdir, metadata, params_toml):
+    if not params_toml.get("highlight", True):
+        return []
+
+    url = metadata["url"].replace("%s", metadata["version"])
+    filename = os.path.basename(urlparse(url).path)
+    filepath = os.path.join(tempdir, filename)
+
+    log.info(f"Downloading {filename} from {url}...")
+    download_file(url, filepath)
+    files = [filepath]
+
+    # Replace *first* placeholder with asset version, the other is for the language
+    lang_url = metadata["language_url"].replace("%s", metadata["version"], 1)
+    for lang in params_toml["highlight_languages"]:
+        url = lang_url.replace("%s", lang)
+        filename = os.path.basename(urlparse(url).path)
+        filepath = os.path.join(tempdir, filename)
+
+        log.info(f"Downloading {filename} from {url}...")
+        download_file(url, filepath)
+        files.append(filepath)
+
+    return files
 
 
 def import_generic(tempdir, metadata):
@@ -170,20 +206,34 @@ def import_academicons(tempdir, metadata):
     return [css_path]
 
 
-def import_highlight(tempdir, metadata):
+def import_highlight_css(tempdir, metadata, params_toml):
+    if not params_toml.get("highlight", True):
+        return []
+
     # Replace *first* placeholder with asset version, the other is for the theme
     url = metadata["url"].replace("%s", metadata["version"], 1)  
-    # Assume user is using a light theme.
-    # TODO: Set to .Site.Params.highlight_style if set, or dracula if using a dark theme.
-    hl_theme = "github"
-    url = url.replace("%s", hl_theme)  # Replace the second placeholder with style name.
-    filename = os.path.basename(urlparse(url).path)
-    filepath = os.path.join(tempdir, filename)
+    theme = params_toml.get("highlight_style", None)
+    if theme:
+        url = url.replace("%s", theme)  # Replace the second placeholder with style name.
+        filename = os.path.basename(urlparse(url).path)
+        filepath = os.path.join(tempdir, filename)
 
-    log.info(f"Downloading {filename} from {url}...")
-    download_file(url, filepath)
+        log.info(f"Downloading {filename} from {url}...")
+        download_file(url, filepath)
 
-    return [filepath]
+        return [filepath]
+
+    for theme in ["github", "dracula"]:
+        url = url.replace("%s", theme)  # Replace the second placeholder with style name.
+        filename = os.path.basename(urlparse(url).path)
+        filepath = os.path.join(tempdir, filename)
+
+        log.info(f"Downloading {filename} from {url}...")
+        download_file(url, filepath)
+
+        shutil.copy2(filepath, os.path.join(VENDOR_PATH, "css", f"{theme}.css"))
+
+    return []
 
 
 def download_file(url, file_name):
