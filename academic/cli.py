@@ -73,6 +73,7 @@ def parse_args(args):
     parser_a.add_argument("--featured", action="store_true", help="Flag publications as featured")
     parser_a.add_argument("--overwrite", action="store_true", help="Overwrite existing publications")
     parser_a.add_argument("--normalize", action="store_true", help="Normalize each keyword to lowercase with uppercase first letter")
+    parser_a.add_argument("--type", action="store_true", help="Set each publication's type in its front matter")
     parser_a.add_argument("-v", "--verbose", action="store_true", required=False, help="Verbose mode")
     parser_a.add_argument("-dr", "--dry-run", action="store_true", required=False, help="Perform a dry run (Bibtex only)")
 
@@ -106,11 +107,12 @@ def parse_args(args):
                 featured=known_args.featured,
                 overwrite=known_args.overwrite,
                 normalize=known_args.normalize,
+                type=known_args.type,
                 dry_run=known_args.dry_run,
             )
 
 
-def import_bibtex(bibtex, pub_dir="publication", featured=False, overwrite=False, normalize=False, dry_run=False):
+def import_bibtex(bibtex, pub_dir="publication", featured=False, overwrite=False, normalize=False, type=False, dry_run=False):
     """Import publications from BibTeX file"""
 
     # Check BibTeX file exists.
@@ -126,10 +128,10 @@ def import_bibtex(bibtex, pub_dir="publication", featured=False, overwrite=False
         parser.ignore_nonstandard_types = False
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
-            parse_bibtex_entry(entry, pub_dir=pub_dir, featured=featured, overwrite=overwrite, normalize=normalize, dry_run=dry_run)
+            parse_bibtex_entry(entry, pub_dir=pub_dir, featured=featured, overwrite=overwrite, normalize=normalize, type=type, dry_run=dry_run)
 
 
-def parse_bibtex_entry(entry, pub_dir="publication", featured=False, overwrite=False, normalize=False, dry_run=False):
+def parse_bibtex_entry(entry, pub_dir="publication", featured=False, overwrite=False, normalize=False, type=False, dry_run=False):
     """Parse a bibtex entry and generate corresponding publication bundle"""
     log.info(f"Parsing entry {entry['ID']}")
 
@@ -161,6 +163,8 @@ def parse_bibtex_entry(entry, pub_dir="publication", featured=False, overwrite=F
     # Prepare YAML front matter for Markdown file.
     frontmatter = ["---"]
     frontmatter.append(f'title: "{clean_bibtex_str(entry["title"])}"')
+    if type:
+        frontmatter.append(f'type: publication')
     year = ""
     month = "01"
     day = "01"
