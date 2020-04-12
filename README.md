@@ -6,10 +6,15 @@
 
 An admin tool for [Academic](https://sourcethemes.com/academic/).
 
-Features
+**Features**
 
 * Import publications from BibTeX
-* Import third-party assets to generate an entirely offline site
+* Hugo command pass-through
+
+**Community**
+
+- 💬 [Chat with the **Academic community**](https://spectrum.chat/academic) or [**Hugo community**](https://discourse.gohugo.io)
+- 🐦 Twitter: [@source_themes](https://twitter.com/source_themes) [@GeorgeCushen](https://twitter.com/GeorgeCushen) [#MadeWithAcademic](https://twitter.com/search?q=%23MadeWithAcademic&src=typd)
 
 ## Prerequisites
 
@@ -48,12 +53,6 @@ Optional arguments:
 
 After importing publications, [a full text PDF and image can be associated with each item and further details added via extra parameters](https://sourcethemes.com/academic/docs/managing-content/#manually).
 
-**Import third-party JS and CSS assets for building an offline website:**
-
-    academic import --assets
-
-*Importing assets requires Academic v3+.*
-
 **Run a Hugo command (pass-through):**
 
     academic server
@@ -68,10 +67,11 @@ For local development, clone this repository and install the tool using the foll
 
 Support development of Academic:
 
-  - [Donate a coffee](https://paypal.me/cushen)
-  - [Become a backer on Patreon](https://www.patreon.com/cushen)
-  - [Decorate your laptop or journal with an Academic sticker](https://www.redbubble.com/people/neutreno/works/34387919-academic)
-  - [Wear the T-shirt](https://academic.threadless.com/)
+  - ☕️ [**Donate a coffee**](https://paypal.me/cushen)
+  - 💵 [Become a backer on **Patreon**](https://www.patreon.com/cushen)
+  - 🖼️ [Decorate your laptop or journal with an Academic **sticker**](https://www.redbubble.com/people/neutreno/works/34387919-academic)
+  - 👕 [Wear the **T-shirt**](https://academic.threadless.com/)
+  - :woman_technologist: [**Contribute**](https://sourcethemes.com/academic/docs/contribute/)
 
 ## License
 
