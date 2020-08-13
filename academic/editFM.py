@@ -11,11 +11,13 @@ class EditableFM:
         if delim != "---":
             raise NotImplementedError("Currently, YAML is the only supported front-matter format.")
         self.delim = delim
+        self.fm = []
+        self.content = []
+        self.path = ""
 
     def load(self, file: Path):
         self.fm = []
         self.content = []
-
         self.path = self.base_path / file
 
         file = open(self.path, "r").readlines()
