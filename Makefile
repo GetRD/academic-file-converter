@@ -1,4 +1,4 @@
-.PHONY: black lint test
+.PHONY: black lint test publish
 
 format:
 	isort --profile black .
