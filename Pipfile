@@ -7,10 +7,11 @@ verify_ssl = true
 toml = "*"
 requests = "*"
 bibtexparser = "==1.1.0"
-ruamel.yaml = ">=0.16.0"
+"ruamel.yaml" = "==0.16.10"
 
 [dev-packages]
 pytest = "*"
 flake8 = "*"
 twine = "*"
 black = "==19.10b0"
+isort = "*"
