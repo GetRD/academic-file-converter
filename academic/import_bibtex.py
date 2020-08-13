@@ -1,19 +1,19 @@
-import subprocess
+import calendar
 import os
 import re
+import subprocess
 import time
-from pathlib import Path
-import calendar
 from datetime import datetime
-from academic import utils
-from academic.editFM import EditableFM
+from pathlib import Path
 
 import bibtexparser
+from bibtexparser.bibdatabase import BibDatabase
 from bibtexparser.bparser import BibTexParser
 from bibtexparser.bwriter import BibTexWriter
-from bibtexparser.bibdatabase import BibDatabase
 from bibtexparser.customization import convert_to_unicode
 
+from academic import utils
+from academic.editFM import EditableFM
 
 # Map BibTeX to Academic publication types.
 PUB_TYPES = {
@@ -34,15 +34,10 @@ PUB_TYPES = {
 
 
 def import_bibtex(
-    bibtex,
-    pub_dir="publication",
-    featured=False,
-    overwrite=False,
-    normalize=False,
-    dry_run=False,
+    bibtex, pub_dir="publication", featured=False, overwrite=False, normalize=False, dry_run=False,
 ):
     """Import publications from BibTeX file"""
-    from academic.cli import log, AcademicError
+    from academic.cli import AcademicError, log
 
     # Check BibTeX file exists.
     if not Path(bibtex).is_file():
@@ -58,22 +53,12 @@ def import_bibtex(
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
             parse_bibtex_entry(
-                entry,
-                pub_dir=pub_dir,
-                featured=featured,
-                overwrite=overwrite,
-                normalize=normalize,
-                dry_run=dry_run,
+                entry, pub_dir=pub_dir, featured=featured, overwrite=overwrite, normalize=normalize, dry_run=dry_run,
             )
 
 
 def parse_bibtex_entry(
-    entry,
-    pub_dir="publication",
-    featured=False,
-    overwrite=False,
-    normalize=False,
-    dry_run=False,
+    entry, pub_dir="publication", featured=False, overwrite=False, normalize=False, dry_run=False,
 ):
     """Parse a bibtex entry and generate corresponding publication bundle"""
     from academic.cli import log
@@ -88,10 +73,7 @@ def parse_bibtex_entry(
 
     # Do not overwrite publication bundle if it already exists.
     if not overwrite and os.path.isdir(bundle_path):
-        log.warning(
-            f"Skipping creation of {bundle_path} as it already exists. "
-            f"To overwrite, add the `--overwrite` argument."
-        )
+        log.warning(f"Skipping creation of {bundle_path} as it already exists. " f"To overwrite, add the `--overwrite` argument.")
         return
 
     # Create bundle dir.
@@ -110,10 +92,7 @@ def parse_bibtex_entry(
 
     # Prepare YAML front matter for Markdown file.
     hugo = utils.hugo_in_docker_or_local()
-    subprocess.call(
-        f"{hugo} new {markdown_path} --kind publication",
-        shell=True
-    )
+    subprocess.call(f"{hugo} new {markdown_path} --kind publication", shell=True)
     if "docker-compose" in hugo:
         time.sleep(2)
 
@@ -148,9 +127,7 @@ def parse_bibtex_entry(
         authors = entry["editor"]
 
     if authors:
-        authors = clean_bibtex_authors(
-            [i.strip() for i in authors.replace("\n", " ").split(" and ")]
-        )
+        authors = clean_bibtex_authors([i.strip() for i in authors.replace("\n", " ").split(" and ")])
         page.fm["authors"] = authors
 
     page.fm["publication_types"] = [PUB_TYPES.get(entry["ENTRYTYPE"], "0")]
@@ -200,12 +177,8 @@ def slugify(s, lower=True):
 
     s = re.sub(r"(\D+)(\d+)", r"\1\-\2", s)  # Delimit non-number, number.
     s = re.sub(r"(\d+)(\D+)", r"\1\-\2", s)  # Delimit number, non-number.
-    s = re.sub(
-        r"((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))", r"\-\1", s
-    )  # Delimit camelcase.
-    s = "".join(
-        c for c in s if c.isalnum() or c in good_symbols
-    ).strip()  # Strip non-alphanumeric and non-hyphen.
+    s = re.sub(r"((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))", r"\-\1", s)  # Delimit camelcase.
+    s = "".join(c for c in s if c.isalnum() or c in good_symbols).strip()  # Strip non-alphanumeric and non-hyphen.
     s = re.sub("-{2,}", "-", s)  # Remove consecutive hyphens.
 
     if lower:
@@ -232,7 +205,7 @@ def clean_bibtex_authors(author_str):
 
         if last_name in ["jnr", "jr", "junior"]:
             last_name = first_names.pop()
-            
+
         for item in first_names:
             if item in ["ben", "van", "der", "de", "la", "le"]:
                 last_name = first_names.pop() + " " + last_name

@@ -1,11 +1,11 @@
-from pathlib import Path
-from urllib.parse import urlparse
-import tempfile
 import logging
 import os
+import tempfile
+from pathlib import Path
+from urllib.parse import urlparse
+
 import toml
 from requests import get
-
 
 JS_FILENAME = "static/js/vendor/main.min.js"
 CSS_FILENAME = "static/css/vendor/main.min.css"
@@ -26,8 +26,7 @@ def import_assets():
     academic_filename = "themes/academic/data/academic.toml"
     if not Path(academic_filename).is_file():
         log.error(
-            "Could not detect Academic version in `themes/academic/data/academic.toml`. "
-            "You may need to update Academic in order to use this tool."
+            "Could not detect Academic version in `themes/academic/data/academic.toml`. " "You may need to update Academic in order to use this tool."
         )
         return
 
@@ -35,9 +34,7 @@ def import_assets():
     # Note that the order of assets in `assets.toml` matters since they will be concatenated in the order they appear.
     assets_filename = "themes/academic/data/assets.toml"
     if not Path(assets_filename).is_file():
-        log.error(
-            "Could not detect assets file. You may need to update Academic in order to use this tool."
-        )
+        log.error("Could not detect assets file. You may need to update Academic in order to use this tool.")
         return
 
     # Create output dirs if necessary
@@ -52,9 +49,7 @@ def import_assets():
         # Parse JS assets
         js_files = []
         for i, j in parsed_toml["js"].items():
-            url = j["url"].replace(
-                "%s", j["version"], 1
-            )  # Replace placeholder with asset version.
+            url = j["url"].replace("%s", j["version"], 1)  # Replace placeholder with asset version.
             filename = os.path.basename(urlparse(url).path)
             filepath = os.path.join(d, filename)
             js_files.append(filepath)
@@ -68,18 +63,14 @@ def import_assets():
         # Parse CSS assets
         css_files = []
         for i, j in parsed_toml["css"].items():
-            url = j["url"].replace(
-                "%s", j["version"], 1
-            )  # Replace placeholder with asset version.
+            url = j["url"].replace("%s", j["version"], 1)  # Replace placeholder with asset version.
 
             # Special case for highlight.js style
             if i == "highlight":
                 # Assume user is using a light theme.
                 # TODO: Set to .Site.Params.highlight_style if set, or dracula if using a dark theme.
                 hl_theme = "github"
-                url = url.replace(
-                    "%s", hl_theme
-                )  # Replace the second placeholder with style name.
+                url = url.replace("%s", hl_theme)  # Replace the second placeholder with style name.
             filename = os.path.basename(urlparse(url).path)
             filepath = os.path.join(d, filename)
             css_files.append(filepath)

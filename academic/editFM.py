@@ -9,9 +9,7 @@ class EditableFM:
     def __init__(self, base_path: Path, delim: str = "---"):
         self.base_path = Path(base_path)
         if delim != "---":
-            raise NotImplementedError(
-                "Currently, YAML is the only supported front-matter format."
-            )
+            raise NotImplementedError("Currently, YAML is the only supported front-matter format.")
         self.delim = delim
 
     def load(self, file: Path):
@@ -22,7 +20,6 @@ class EditableFM:
 
         file = open(self.path, "r").readlines()
 
-        lineno = 0
         delims_seen = 0
         for line in file:
             if line.startswith(self.delim):
