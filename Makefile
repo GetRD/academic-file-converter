@@ -9,3 +9,6 @@ lint:
 
 test:
 	python -m pytest
+
+publish:
+	python setup.py publish
