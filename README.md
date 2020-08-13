@@ -13,17 +13,16 @@ An admin tool for [Academic](https://sourcethemes.com/academic/).
 
 **Community**
 
-- 💬 [Chat with the **Academic community**](https://spectrum.chat/academic) or [**Hugo community**](https://discourse.gohugo.io)
+- 💬 [Chat with the **Academic community**](https://discord.gg/z8wNYzb) or [**Hugo community**](https://discourse.gohugo.io)
 - 🐦 Twitter: [@source_themes](https://twitter.com/source_themes) [@GeorgeCushen](https://twitter.com/GeorgeCushen) [#MadeWithAcademic](https://twitter.com/search?q=%23MadeWithAcademic&src=typd)
 
 **Support**
 
 Support development of Academic:
 
+  - ❤️ [Become a **backer** and **unlock rewards**](https://sourcethemes.com/academic/plans/)
   - ☕️ [**Donate a coffee**](https://paypal.me/cushen)
-  - 💵 [Become a backer on **Patreon**](https://www.patreon.com/cushen)
   - 🖼️ [Decorate your laptop or journal with an Academic **sticker**](https://www.redbubble.com/people/neutreno/works/34387919-academic)
-  - 👕 [Wear the **T-shirt**](https://academic.threadless.com/)
   - :woman_technologist: [**Contribute**](#contribute)
 
 ## Prerequisites
@@ -69,9 +68,16 @@ After importing publications, [a full text PDF and image can be associated with 
 
 ## Contribute
 
-For local development, clone this repository and install the tool using the following command:
+For local development, clone this repository and use Pipenv to install the tool using the following commands:
 
-    pip3 install -e .
+    pip3 install pipenv
+    pipenv install -e .
+
+Preparing a contribution:
+
+- Lint: `make lint`
+- Format: `make format`
+- Test: `make test`
 
 ## License
 
