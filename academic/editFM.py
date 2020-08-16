@@ -19,6 +19,9 @@ class EditableFM:
         self.fm = []
         self.content = []
         self.path = self.base_path / file
+        if not self.path.exists():
+            self.fm = dict()
+            return
 
         file = open(self.path, "r").readlines()
 
