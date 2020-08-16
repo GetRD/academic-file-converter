@@ -4,6 +4,7 @@ import re
 import subprocess
 import time
 from datetime import datetime
+from enum import Enum
 from pathlib import Path
 
 import bibtexparser
@@ -15,21 +16,34 @@ from bibtexparser.customization import convert_to_unicode
 from academic import utils
 from academic.editFM import EditableFM
 
+
 # Map BibTeX to Academic publication types.
+class PublicationType(Enum):
+    Uncategorized = 0,
+    ConferencePaper = 1
+    JournalArticle = 2
+    Preprint = 3
+    Report = 4
+    Book = 5
+    BookSection = 6
+    Thesis = 7  # (v4.2+ required)
+    Patent = 8  # (v4.2+ required)
+
+
 PUB_TYPES = {
-    "article": 2,
-    "book": 5,
-    "inbook": 6,
-    "incollection": 6,
-    "inproceedings": 1,
-    "manual": 4,
-    "mastersthesis": 7,
-    "misc": 0,
-    "phdthesis": 7,
-    "proceedings": 0,
-    "techreport": 4,
-    "unpublished": 3,
-    "patent": 8,
+    "article": PublicationType.JournalArticle,
+    "book": PublicationType.Book,
+    "inbook": PublicationType.BookSection,
+    "incollection": PublicationType.BookSection,
+    "inproceedings": PublicationType.ConferencePaper,
+    "manual": PublicationType.Report,
+    "mastersthesis": PublicationType.Thesis,
+    "misc": PublicationType.Uncategorized,
+    "phdthesis": PublicationType.Thesis,
+    "proceedings": PublicationType.Uncategorized,
+    "techreport": PublicationType.Report,
+    "unpublished": PublicationType.Preprint,
+    "patent": PublicationType.Patent,
 }
 
 
@@ -130,7 +144,8 @@ def parse_bibtex_entry(
         authors = clean_bibtex_authors([i.strip() for i in authors.replace("\n", " ").split(" and ")])
         page.fm["authors"] = authors
 
-    page.fm["publication_types"] = [PUB_TYPES.get(entry["ENTRYTYPE"], "0")]
+    pubtype = PUB_TYPES.get(entry["ENTRYTYPE"], PublicationType.Uncategorized)
+    page.fm["publication_types"] = [str(pubtype.value)]
 
     if "abstract" in entry:
         page.fm["abstract"] = clean_bibtex_str(entry["abstract"])
@@ -166,6 +181,7 @@ def parse_bibtex_entry(
             page.dump()
     except IOError:
         log.error("Could not save file.")
+    return page
 
 
 def slugify(s, lower=True):
