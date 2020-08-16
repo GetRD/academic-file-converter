@@ -53,6 +53,9 @@ def parse_args(args):
     parser_a.add_argument(
         "--normalize", action="store_true", help="Normalize each keyword to lowercase with uppercase first letter",
     )
+    parser_a.add_argument(
+        "--publish-date-from-bibtex", action="store_true", help="Use the bibtex date field as the publishDate metadata instead of the current time"
+    )
     parser_a.add_argument("-v", "--verbose", action="store_true", required=False, help="Verbose mode")
     parser_a.add_argument(
         "-dr", "--dry-run", action="store_true", required=False, help="Perform a dry run (Bibtex only)",
@@ -88,6 +91,7 @@ def parse_args(args):
                 overwrite=known_args.overwrite,
                 normalize=known_args.normalize,
                 dry_run=known_args.dry_run,
+                publish_date_from_bibtex=known_args.publish_date_from_bibtex,
             )
 
 

@@ -17,9 +17,7 @@ from academic.editFM import EditableFM
 from academic.publication_type import PUB_TYPES, PublicationType
 
 
-def import_bibtex(
-    bibtex, pub_dir="publication", featured=False, overwrite=False, normalize=False, dry_run=False,
-):
+def import_bibtex(bibtex, pub_dir="publication", featured=False, overwrite=False, normalize=False, dry_run=False, publish_date_from_bibtex=False):
     """Import publications from BibTeX file"""
     from academic.cli import AcademicError, log
 
@@ -37,13 +35,17 @@ def import_bibtex(
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
             parse_bibtex_entry(
-                entry, pub_dir=pub_dir, featured=featured, overwrite=overwrite, normalize=normalize, dry_run=dry_run,
+                entry,
+                pub_dir=pub_dir,
+                featured=featured,
+                overwrite=overwrite,
+                normalize=normalize,
+                dry_run=dry_run,
+                publish_date_from_bibtex=publish_date_from_bibtex,
             )
 
 
-def parse_bibtex_entry(
-    entry, pub_dir="publication", featured=False, overwrite=False, normalize=False, dry_run=False,
-):
+def parse_bibtex_entry(entry, pub_dir="publication", featured=False, overwrite=False, normalize=False, dry_run=False, publish_date_from_bibtex=False):
     """Parse a bibtex entry and generate corresponding publication bundle"""
     from academic.cli import log
 
@@ -103,7 +105,12 @@ def parse_bibtex_entry(
         log.error(f'Invalid date for entry `{entry["ID"]}`.')
 
     page.fm["date"] = "-".join([year, month, day])
-    page.fm["publishDate"] = timestamp
+    if "publishDate" in page.fm:
+        pass  # don't overwrite the existing publishDate
+    elif publish_date_from_bibtex:
+        page.fm["publishDate"] = page.fm["date"]
+    else:
+        page.fm["publishDate"] = timestamp
 
     authors = None
     if "author" in entry:
