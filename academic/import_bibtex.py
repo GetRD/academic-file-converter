@@ -84,7 +84,7 @@ def parse_bibtex_entry(
     page = EditableFM(Path(bundle_path), dry_run=dry_run)
     page.load(Path("index.md"))
 
-    page.fm["title"] = clean_bibtex_str(entry["title"])
+    page.fm["title"] = entry["title"]
 
     year, month, day = "", "01", "01"
     if "date" in entry:
@@ -119,7 +119,7 @@ def parse_bibtex_entry(
     page.fm["publication_types"] = [str(pubtype.value)]
 
     if "abstract" in entry:
-        page.fm["abstract"] = clean_bibtex_str(entry["abstract"])
+        page.fm["abstract"] = entry["abstract"]
     else:
         page.fm["abstract"] = ""
 
@@ -127,11 +127,11 @@ def parse_bibtex_entry(
 
     # Publication name.
     if "booktitle" in entry:
-        publication = "*" + clean_bibtex_str(entry["booktitle"]) + "*"
+        publication = "*" + entry["booktitle"] + "*"
     elif "journal" in entry:
-        publication = "*" + clean_bibtex_str(entry["journal"]) + "*"
+        publication = "*" + entry["journal"] + "*"
     elif "publisher" in entry:
-        publication = "*" + clean_bibtex_str(entry["publisher"]) + "*"
+        publication = "*" + entry["publisher"] + "*"
     else:
         publication = ""
     page.fm["publication"] = publication
@@ -140,10 +140,10 @@ def parse_bibtex_entry(
         page.fm["tags"] = clean_bibtex_tags(entry["keywords"], normalize)
 
     if "url" in entry:
-        page.fm["url_pdf"] = clean_bibtex_str(entry["url"])
+        page.fm["url_pdf"] = entry["url"]
 
     if "doi" in entry:
-        page.fm["doi"] = clean_bibtex_str(entry["doi"])
+        page.fm["doi"] = entry["doi"]
 
     # Save Markdown file.
     try:
@@ -202,24 +202,11 @@ def clean_bibtex_authors(author_str):
     return authors
 
 
-def clean_bibtex_str(s):
-    """Clean BibTeX string and escape TOML special characters"""
-    s = s.replace("\\", "")
-    s = s.replace('"', '\\"')
-    s = s.replace("{", "").replace("}", "")
-    s = s.replace("\t", " ").replace("\n", " ").replace("\r", "")
-    return s
-
-
 def clean_bibtex_tags(s, normalize=False):
     """Clean BibTeX keywords and convert to TOML tags"""
-
-    tags = clean_bibtex_str(s).split(",")
-    tags = [f'"{tag.strip()}"' for tag in tags]
-
+    tags = [tag.strip() for tag in s.split(",")]
     if normalize:
         tags = [tag.lower().capitalize() for tag in tags]
-
     return tags
 
 

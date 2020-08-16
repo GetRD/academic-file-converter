@@ -40,13 +40,16 @@ class EditableFM:
         # Parse YAML, trying to preserve comments and whitespace
         self.fm = yaml.load("".join(self.fm))
 
+    def write_to_file(self, f):
+        f.write("{}\n".format(self.delim))
+        yaml.dump(self.fm, f)
+        f.write("{}\n".format(self.delim))
+        f.writelines(self.content)
+
     def dump(self):
         assert self.path, "You need to `.load()` first."
         if self.dry_run:
             return
 
         with open(self.path, "w", encoding="utf-8") as f:
-            f.write("{}\n".format(self.delim))
-            yaml.dump(self.fm, f)
-            f.write("{}\n".format(self.delim))
-            f.writelines(self.content)
+            self.write_to_file(f)
