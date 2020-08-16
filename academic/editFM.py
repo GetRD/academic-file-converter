@@ -20,7 +20,10 @@ class EditableFM:
         self.content = []
         self.path = self.base_path / file
 
-        file = open(self.path, "r").readlines()
+        if not self.path.exists():
+            self.fm = dict()
+            return
+        file = self.path.open("r").readlines()
 
         delims_seen = 0
         for line in file:
