@@ -1,5 +1,3 @@
-import logging
-import tempfile
 from pathlib import Path
 
 import bibtexparser
@@ -34,4 +32,8 @@ def _test_publication_type(metadata: EditableFM, expected_type: import_bibtex.Pu
 
 def test_bibtex_types():
     _test_publication_type(_process_bibtex('article.bib')[0], import_bibtex.PublicationType.JournalArticle)
-    _test_publication_type(_process_bibtex('report.bib')[0], import_bibtex.PublicationType.Report)
+    for metadata in _process_bibtex('report.bib', expected_count=3):
+        _test_publication_type(metadata, import_bibtex.PublicationType.Report)
+    for metadata in _process_bibtex('thesis.bib', expected_count=3):
+        _test_publication_type(metadata, import_bibtex.PublicationType.Thesis)
+    _test_publication_type(_process_bibtex('book.bib')[0], import_bibtex.PublicationType.Book)
