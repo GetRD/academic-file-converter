@@ -92,9 +92,10 @@ def parse_bibtex_entry(
 
     # Prepare YAML front matter for Markdown file.
     hugo = utils.hugo_in_docker_or_local()
-    subprocess.call(f"{hugo} new {markdown_path} --kind publication", shell=True)
-    if "docker-compose" in hugo:
-        time.sleep(2)
+    if not dry_run:
+        subprocess.call(f"{hugo} new {markdown_path} --kind publication", shell=True)
+        if "docker-compose" in hugo:
+            time.sleep(2)
 
     page = EditableFM(bundle_path)
     page.load("index.md")
