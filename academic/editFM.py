@@ -38,7 +38,7 @@ class EditableFM:
     def dump(self):
         assert self.path, "You need to `.load()` first."
 
-        with open(self.path, "w") as f:
+        with open(self.path, "w", encoding="utf-8") as f:
             f.write("{}\n".format(self.delim))
             yaml.dump(self.fm, f)
             f.write("{}\n".format(self.delim))
