@@ -124,8 +124,16 @@ def parse_bibtex_entry(entry, pub_dir='publication', featured=False, overwrite=F
     frontmatter.append('title = "{}"'.format(clean_bibtex_str(entry['title'])))
     if 'month' in entry:
         frontmatter.append('date = {}-{}-01'.format(entry['year'], month2number(entry['month'])))
-    else:
+    elif 'year' in entry:
         frontmatter.append('date = {}-01-01'.format(entry['year']))
+    elif 'date' in entry:
+        match = re.match(r'\d\d\d\d', entry['date'])
+        if match:
+            frontmatter.append('date = {}-01-01'.format(match.group(0)))
+        else:
+            print("ERROR: could not find year in date %r", entry['date'])
+    else:
+        print("ERROR: date missing")
 
     authors = clean_bibtex_authors([i.strip() for i in entry['author'].replace('\n', ' ').split(' and ')])
     frontmatter.append('authors = [{}]'.format(', '.join(authors)))
