@@ -16,9 +16,12 @@ class EditableFM:
         self.path = ""
 
     def load(self, file: Path):
-        self.fm = []
         self.content = []
         self.path = self.base_path / file
+        if not self.path.exists():
+            self.fm = {}
+            return
+        self.fm = []
 
         file = open(self.path, "r").readlines()
 
