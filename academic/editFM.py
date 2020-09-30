@@ -23,10 +23,11 @@ class EditableFM:
             self.fm = dict()
             return
 
-        file = open(self.path, "r").readlines()
+        with self.path.open("r", encoding="utf-8") as f:
+            lines = open(self.path, "r").readlines()
 
         delims_seen = 0
-        for line in file:
+        for line in lines:
             if line.startswith(self.delim):
                 delims_seen += 1
             else:
