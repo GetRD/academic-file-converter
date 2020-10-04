@@ -97,8 +97,8 @@ def parse_bibtex_entry(
         if "docker-compose" in hugo:
             time.sleep(2)
 
-    page = EditableFM(bundle_path)
-    page.load("index.md")
+    page = EditableFM(Path(bundle_path), dry_run=dry_run)
+    page.load(Path("index.md"))
 
     page.fm["title"] = clean_bibtex_str(entry["title"])
 
