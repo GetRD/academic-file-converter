@@ -28,7 +28,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install pipenv
-    uses: dschep/install-pipenv-action@v1
+      uses: dschep/install-pipenv-action@v1
     - name: Install dependencies
       run: |
         pipenv install --dev
