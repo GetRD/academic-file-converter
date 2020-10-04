@@ -1,4 +1,4 @@
-name: Test python package
+name: Test, lint, format
 
 on: [push, pull_request]
 
