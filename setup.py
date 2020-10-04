@@ -32,7 +32,7 @@ if sys.argv[-1] == "publish":
     shutil.rmtree("academic.egg-info")
     sys.exit()
 
-with open("README.md", "r") as fh:
+with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
@@ -40,11 +40,14 @@ setup(
     version=version,
     author="George Cushen",
     author_email="hugo-discuss@googlegroups.com",
-    url="https://sourcethemes.com/academic/",
-    description="The website designer for Hugo",
+    url="https://wowchemy.com",
+    description="Import publications from your reference manager to Hugo",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    keywords=("cli academic hugo theme static-site-generator cms blog-engine" "github-pages netlify hugo-theme documentation-generator"),
+    keywords=(
+        "hugo academic cli wowchemy bibtex markdown latex tex theme static-site-generator cms"
+        "blog-engine github-pages netlify hugo-theme documentation-generator"
+    ),
     include_package_data=True,
     license="MIT",
     packages=find_packages(exclude=["tests"]),
