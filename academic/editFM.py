@@ -25,7 +25,7 @@ class EditableFM:
             return
 
         with self.path.open("r", encoding="utf-8") as f:
-            lines = open(self.path, "r").readlines()
+            lines = f.readlines()
 
         delims_seen = 0
         for line in lines:
