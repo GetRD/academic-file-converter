@@ -23,17 +23,14 @@ jobs:
         pipenv install --dev -e .
     - name: Lint with flake8
       run: |
-        # stop the build if there are Python syntax errors or undefined names
-        pipenv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        pipenv run flake8 . --count --exit-zero --max-complexity=10 --statistics
+        pipenv run flake8 . --count --show-source --statistics
     - name: Test with pytest
       run: |
         pipenv run pytest
     - name: Formatting checks
       run: |
-        pipenv run isort --profile black --recursive --diff
+        pipenv run isort --profile black --recursive --diff .
         pipenv run black --check .
     - name: Report Coverage
-      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8'
+      if: matrix.python-version == '3.8'
       uses: codecov/codecov-action@v1.0.6
