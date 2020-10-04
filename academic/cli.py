@@ -11,23 +11,6 @@ from academic import utils
 from academic.import_assets import import_assets
 from academic.import_bibtex import import_bibtex
 
-# Map BibTeX to Academic publication types.
-PUB_TYPES = {
-    "article": 2,
-    "book": 5,
-    "inbook": 6,
-    "incollection": 6,
-    "inproceedings": 1,
-    "manual": 4,
-    "mastersthesis": 7,
-    "misc": 0,
-    "phdthesis": 7,
-    "proceedings": 0,
-    "techreport": 4,
-    "unpublished": 3,
-    "patent": 8,
-}
-
 # Initialise logger.
 logging.basicConfig(
     format="%(asctime)s %(levelname)s: %(message)s", level=logging.WARNING, datefmt="%I:%M:%S%p",
