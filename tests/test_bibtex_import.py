@@ -45,5 +45,9 @@ def test_bibtex_types():
     This test uses the import_bibtex functions to parse a .bib file and checks that the
     resulting metadata has the correct publication type set.
     """
-    _test_publication_type(_process_bibtex('article.bib')[0], import_bibtex.PublicationType.JournalArticle)
-    _test_publication_type(_process_bibtex('report.bib')[0], import_bibtex.PublicationType.Report)
+    _test_publication_type(_process_bibtex("article.bib")[0], import_bibtex.PublicationType.JournalArticle)
+    for metadata in _process_bibtex("report.bib", expected_count=3):
+        _test_publication_type(metadata, import_bibtex.PublicationType.Report)
+    for metadata in _process_bibtex("thesis.bib", expected_count=3):
+        _test_publication_type(metadata, import_bibtex.PublicationType.Thesis)
+    _test_publication_type(_process_bibtex("book.bib")[0], import_bibtex.PublicationType.Book)
