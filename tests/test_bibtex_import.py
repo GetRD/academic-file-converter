@@ -76,7 +76,7 @@ def test_resulting_yaml_output():
     lines = [line.strip() for line in lines]  # .strip() to remove newline at end
     assert lines == [
         "---",
-        "title: The Title of the book",
+        "title: The Title of the book \"contains 'quotes'\"",
         "date: '2019-01-01'",
         "authors:",
         "- Nelson Bigetti",
