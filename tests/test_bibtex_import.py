@@ -58,6 +58,7 @@ def test_bibtex_types():
 def test_resulting_yaml_output():
     """
     This test checks that the YAML generated for a .bib file looks as expected and that newlines are not filtered out.
+    Also checks that curly braces in the bibtex are removed correctly.
     """
     result = _process_bibtex("book.bib", normalize=True)[0]
 
@@ -75,7 +76,7 @@ def test_resulting_yaml_output():
     lines = [line.strip() for line in lines]  # .strip() to remove newline at end
     assert lines == [
         "---",
-        "title: The title of the book",
+        "title: The Title of the book",
         "date: '2019-01-01'",
         "authors:",
         "- Nelson Bigetti",
@@ -83,7 +84,7 @@ def test_resulting_yaml_output():
         "- '5'",
         'abstract: "Paragraph one.\\n\\nParagraph two.\\n\\nParagraph three."',
         "featured: false",
-        "publication: ''",
+        "publication: '*IEEE*'",
         "tags:",
         "- Tag1",
         "- Tag with spaces",
