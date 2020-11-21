@@ -43,6 +43,10 @@ Open your Terminal or Command Prompt app and install the Academic CLI tool:
 
     pip3 install -U academic
 
+Alternatively, install Academic CLI v0.5.1 if you do not wish to install Hugo on your computer:
+
+    pip3 install academic==0.5.1
+
 ## Usage
 
 Use the `cd` command to navigate to your website folder in the terminal:
