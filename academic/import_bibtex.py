@@ -18,13 +18,7 @@ from academic.publication_type import PUB_TYPES, PublicationType
 
 
 def import_bibtex(
-    bibtex,
-    pub_dir="publication",
-    taxonomy_name="tags",
-    featured=False,
-    overwrite=False,
-    normalize=False,
-    dry_run=False,
+    bibtex, pub_dir="publication", taxonomy_name="tags", featured=False, overwrite=False, normalize=False, dry_run=False,
 ):
     """Import publications from BibTeX file"""
     from academic.cli import AcademicError, log
@@ -43,24 +37,12 @@ def import_bibtex(
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
             parse_bibtex_entry(
-                entry,
-                pub_dir=pub_dir,
-                taxonomy_name=taxonomy_name,
-                featured=featured,
-                overwrite=overwrite,
-                normalize=normalize,
-                dry_run=dry_run,
+                entry, pub_dir=pub_dir, taxonomy_name=taxonomy_name, featured=featured, overwrite=overwrite, normalize=normalize, dry_run=dry_run,
             )
 
 
 def parse_bibtex_entry(
-    entry,
-    pub_dir="publication",
-    taxonomy_name="tags",
-    featured=False,
-    overwrite=False,
-    normalize=False,
-    dry_run=False,
+    entry, pub_dir="publication", taxonomy_name="tags", featured=False, overwrite=False, normalize=False, dry_run=False,
 ):
     """Parse a bibtex entry and generate corresponding publication bundle"""
     from academic.cli import log

@@ -13,9 +13,7 @@ from academic.import_bibtex import import_bibtex
 
 # Initialise logger.
 logging.basicConfig(
-    format="%(asctime)s %(levelname)s: %(message)s",
-    level=logging.WARNING,
-    datefmt="%I:%M:%S%p",
+    format="%(asctime)s %(levelname)s: %(message)s", level=logging.WARNING, datefmt="%I:%M:%S%p",
 )
 log = logging.getLogger(__name__)
 
@@ -33,17 +31,14 @@ def parse_args(args):
 
     # Initialise command parser.
     parser = argparse.ArgumentParser(
-        description=f"Academic Admin Tool v{version}\nhttps://sourcethemes.com/academic/",
-        formatter_class=RawTextHelpFormatter,
+        description=f"Academic Admin Tool v{version}\nhttps://sourcethemes.com/academic/", formatter_class=RawTextHelpFormatter,
     )
     subparsers = parser.add_subparsers(help="Sub-commands", dest="command")
 
     # Sub-parser for import command.
     parser_a = subparsers.add_parser("import", help="Import data into Academic")
     parser_a.add_argument(
-        "--assets",
-        action="store_true",
-        help="Import third-party JS and CSS for generating an offline site",
+        "--assets", action="store_true", help="Import third-party JS and CSS for generating an offline site",
     )
     parser_a.add_argument("--bibtex", required=False, type=str, help="File path to your BibTeX file")
     parser_a.add_argument(
@@ -63,17 +58,11 @@ def parse_args(args):
     parser_a.add_argument("--featured", action="store_true", help="Flag publications as featured")
     parser_a.add_argument("--overwrite", action="store_true", help="Overwrite existing publications")
     parser_a.add_argument(
-        "--normalize",
-        action="store_true",
-        help="Normalize each keyword to lowercase with uppercase first letter",
+        "--normalize", action="store_true", help="Normalize each keyword to lowercase with uppercase first letter",
     )
     parser_a.add_argument("-v", "--verbose", action="store_true", required=False, help="Verbose mode")
     parser_a.add_argument(
-        "-dr",
-        "--dry-run",
-        action="store_true",
-        required=False,
-        help="Perform a dry run (Bibtex only)",
+        "-dr", "--dry-run", action="store_true", required=False, help="Perform a dry run (Bibtex only)",
     )
 
     known_args, unknown = parser.parse_known_args(args)
