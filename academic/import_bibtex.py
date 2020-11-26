@@ -20,7 +20,7 @@ from academic.publication_type import PUB_TYPES, PublicationType
 def import_bibtex(
     bibtex,
     pub_dir="publication",
-    kw_name="tags",
+    taxonomy_name="tags",
     featured=False,
     overwrite=False,
     normalize=False,
@@ -45,7 +45,7 @@ def import_bibtex(
             parse_bibtex_entry(
                 entry,
                 pub_dir=pub_dir,
-                kw_name=kw_name,
+                taxonomy_name=taxonomy_name,
                 featured=featured,
                 overwrite=overwrite,
                 normalize=normalize,
@@ -56,7 +56,7 @@ def import_bibtex(
 def parse_bibtex_entry(
     entry,
     pub_dir="publication",
-    kw_name="tags",
+    taxonomy_name="tags",
     featured=False,
     overwrite=False,
     normalize=False,
@@ -155,7 +155,7 @@ def parse_bibtex_entry(
     page.fm["publication"] = publication
 
     if "keywords" in entry:
-        page.fm[kw_name] = clean_bibtex_tags(entry["keywords"], normalize)
+        page.fm[taxonomy_name] = clean_bibtex_tags(entry["keywords"], normalize)
 
     if "url" in entry:
         page.fm["url_pdf"] = clean_bibtex_str(entry["url"])

@@ -54,7 +54,7 @@ def parse_args(args):
         help="Directory that your publications are stored in (default `publication`)",
     )
     parser_a.add_argument(
-        "--keyword-name",
+        "--taxonomy-name",
         required=False,
         type=str,
         default="tags",
@@ -102,7 +102,7 @@ def parse_args(args):
             import_bibtex(
                 known_args.bibtex,
                 pub_dir=known_args.publication_dir,
-                kw_name=known_args.keyword_name,
+                taxonomy_name=known_args.taxonomy_name,
                 featured=known_args.featured,
                 overwrite=known_args.overwrite,
                 normalize=known_args.normalize,
