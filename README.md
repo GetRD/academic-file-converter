@@ -67,6 +67,7 @@ Optional arguments:
 * `--featured` Flag publications as *featured* (to appear in *Featured Publications* widget)
 * `--overwrite` Overwrite existing publications
 * `--publication-dir PUBLICATION_DIR` Path to your publications directory (defaults to `publication`)
+* `--taxonomy-name TAXONOMY_NAME` Hugo taxonomy used for publication keywords (defaults to `tags`)
 * `--normalize` Normalize tags by converting them to lowercase and capitalizing the first letter
 * `--verbose` or `-v` Show verbose messages
 
