@@ -215,7 +215,7 @@ def clean_bibtex_tags(s, normalize=False):
     """Clean BibTeX keywords and convert to TOML tags"""
 
     tags = clean_bibtex_str(s).split(",")
-    tags = [f'"{tag.strip()}"' for tag in tags]
+    tags = [tag.strip() for tag in tags]
 
     if normalize:
         tags = [tag.lower().capitalize() for tag in tags]
