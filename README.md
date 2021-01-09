@@ -46,6 +46,10 @@ Open your Terminal or Command Prompt app and install the Academic CLI tool:
 Alternatively, install Academic CLI v0.5.1 if you do not wish to install Hugo on your computer:
 
     pip3 install academic==0.5.1
+    
+Or, help test the lastest development version:
+
+    pip3 install -U git+https://github.com/wowchemy/hugo-academic-cli.git
 
 ## Usage
 
