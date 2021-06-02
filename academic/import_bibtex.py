@@ -20,7 +20,20 @@ from academic.publication_type import PUB_TYPES, PublicationType
 def import_bibtex(
     bibtex, pub_dir="publication", featured=False, overwrite=False, normalize=False, dry_run=False,
 ):
-    """Import publications from BibTeX file"""
+    """Import publications from BibTeX file
+        To use `cd` to your website folder then run `academic import --bibtex my_publications.bib`.
+
+        Parameters
+        ----------
+        publication-dir : str relative filepath
+            Path to your publications directory (defaults to `publication`)
+        featured : bool
+            Flag publications as *featured* (to appear in *Featured Publications* widget)
+        overwrite : bool
+            Overwrite existing publications
+        normalize : bool
+            Normalize tags by converting them to lowercase and capitalizing the first letter
+    """
     from academic.cli import AcademicError, log
 
     # Check BibTeX file exists.
