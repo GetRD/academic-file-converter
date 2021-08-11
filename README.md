@@ -14,7 +14,7 @@
 
 **Community**
 
-- 📚 [View the **documentation**](https://wowchemy.com/docs/managing-content/#create-a-publication) and usage guide below
+- 📚 [View the **documentation**](https://wowchemy.com/docs/content/publications/#import-from-bibtex) and usage guide below
 - 💬 [Chat with the **Wowchemy community**](https://discord.gg/z8wNYzb) or [**Hugo community**](https://discourse.gohugo.io)
 - 🐦 Twitter: [@wowchemy](https://twitter.com/wowchemy) [@GeorgeCushen](https://twitter.com/GeorgeCushen) [#MadeWithAcademic](https://twitter.com/search?q=(%23MadeWithWowchemy%20OR%20%23MadeWithAcademic)&src=typed_query)
 
@@ -24,14 +24,14 @@ To help us develop this Academic CLI tool and the associated Wowchemy software s
 
 Support development of the Academic CLI:
 
-  - ❤️ [Become a **backer** and **unlock rewards**](https://wowchemy.com/plans/)
+  - ❤️ [Become a **backer** and **unlock rewards**](https://wowchemy.com/sponsor/)
   - ☕️ [**Donate a coffee**](https://paypal.me/cushen)
   - 👩‍💻 [**Contribute**](#contribute)
 
 ## Prerequisites
 
-1. Create a [Hugo](https://gohugo.io) website such as by using the [Hugo Academic Starter](https://github.com/wowchemy/starter-academic) template for the [Wowchemy](https://wowchemy.com) website builder
-1. [Download your site from GitHub, installing Hugo and its dependencies](https://wowchemy.com/docs/install-locally/)
+1. Create a [Hugo](https://gohugo.io) website such as by using the [Hugo Academic Starter](https://github.com/wowchemy/starter-hugo-academic) template for the [Wowchemy](https://wowchemy.com) website builder
+1. [Download your site from GitHub, installing Hugo and its dependencies](https://wowchemy.com/docs/getting-started/install-hugo-extended/)
 1. Install [Python 3.6+](https://realpython.com/installing-python/) if it’s not already installed
 1. [Version control](https://guides.github.com/introduction/git-handbook/#version-control) your website
    - Ideally, version control your site with [Git](http://rogerdudler.github.io/git-guide/) so that you can review the proposed changes and accept or reject them without risking breaking your site
@@ -74,7 +74,7 @@ Optional arguments:
 * `--normalize` Normalize tags by converting them to lowercase and capitalizing the first letter
 * `--verbose` or `-v` Show verbose messages
 
-After importing publications, [a full text PDF and image can be associated with each item and further details added via extra parameters](https://wowchemy.com/docs/managing-content/#manually).
+After importing publications, [a full text PDF and image can be associated with each item and further details added via extra parameters](https://wowchemy.com/docs/content/publications/#command-line).
 
 **Run a Hugo command (pass-through):**
 
