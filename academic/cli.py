@@ -31,7 +31,7 @@ def parse_args(args):
 
     # Initialise command parser.
     parser = argparse.ArgumentParser(
-        description=f"Academic Admin Tool v{version}\nhttps://sourcethemes.com/academic/", formatter_class=RawTextHelpFormatter,
+        description=f"Hugo Academic CLI v{version}\nhttps://github.com/wowchemy/hugo-academic-cli", formatter_class=RawTextHelpFormatter,
     )
     subparsers = parser.add_subparsers(help="Sub-commands", dest="command")
 
