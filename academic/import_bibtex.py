@@ -145,7 +145,7 @@ def parse_bibtex_entry(
     links = []
     if "archiveprefix" in entry and "eprint" in entry:
         if entry["archiveprefix"].lower() == "arxiv":
-             links += [{"name": "arXiv", "url": "https://arxiv.org/abs/" + clean_bibtex_str(entry["eprint"])}]
+            links += [{"name": "arXiv", "url": "https://arxiv.org/abs/" + clean_bibtex_str(entry["eprint"])}]
 
     if "url" in entry:
         links += [{"name": "URL", "url": clean_bibtex_str(entry["url"])}]
