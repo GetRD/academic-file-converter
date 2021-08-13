@@ -148,7 +148,12 @@ def parse_bibtex_entry(
             links += [{"name": "arXiv", "url": "https://arxiv.org/abs/" + clean_bibtex_str(entry["eprint"])}]
 
     if "url" in entry:
-        links += [{"name": "URL", "url": clean_bibtex_str(entry["url"])}]
+        sane_url = clean_bibtex_str(entry["url"])
+
+        if sane_url[-4:].lower() == ".pdf":
+            page.fm["url_pdf"] = sane_url
+        else:
+            links += [{"name": "URL", "url": sane_url}]
 
     if links:
         page.fm["links"] = links
