@@ -85,9 +85,10 @@ def parse_bibtex_entry(
     page.load(Path("index.md"))
 
     page.fm["title"] = clean_bibtex_str(entry["title"])
+
     if "subtitle" in entry:
         page.fm["subtitle"] = clean_bibtex_str(entry["subtitle"])
-    
+
     year, month, day = "", "01", "01"
     if "date" in entry:
         dateparts = entry["date"].split("-")
