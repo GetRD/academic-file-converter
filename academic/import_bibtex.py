@@ -143,9 +143,8 @@ def parse_bibtex_entry(
         page.fm["doi"] = clean_bibtex_str(entry["doi"])
 
     links = []
-    if "archiveprefix" in entry and "eprint" in entry:
-        if entry["archiveprefix"].lower() == "arxiv":
-            links += [{"name": "arXiv", "url": "https://arxiv.org/abs/" + clean_bibtex_str(entry["eprint"])}]
+    if all(f in entry for f in ["archiveprefix", "eprint"]) and entry["archiveprefix"].lower() == "arxiv":
+        links += [{"name": "arXiv", "url": "https://arxiv.org/abs/" + clean_bibtex_str(entry["eprint"])}]
 
     if "url" in entry:
         sane_url = clean_bibtex_str(entry["url"])
