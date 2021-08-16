@@ -142,11 +142,23 @@ def parse_bibtex_entry(
     if "keywords" in entry:
         page.fm["tags"] = clean_bibtex_tags(entry["keywords"], normalize)
 
-    if "url" in entry:
-        page.fm["url_pdf"] = clean_bibtex_str(entry["url"])
-
     if "doi" in entry:
         page.fm["doi"] = clean_bibtex_str(entry["doi"])
+
+    links = []
+    if all(f in entry for f in ["archiveprefix", "eprint"]) and entry["archiveprefix"].lower() == "arxiv":
+        links += [{"name": "arXiv", "url": "https://arxiv.org/abs/" + clean_bibtex_str(entry["eprint"])}]
+
+    if "url" in entry:
+        sane_url = clean_bibtex_str(entry["url"])
+
+        if sane_url[-4:].lower() == ".pdf":
+            page.fm["url_pdf"] = sane_url
+        else:
+            links += [{"name": "URL", "url": sane_url}]
+
+    if links:
+        page.fm["links"] = links
 
     # Save Markdown file.
     try:
