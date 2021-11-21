@@ -63,18 +63,22 @@ Use the `cd` command to navigate to your website folder in the terminal:
 
 **Import publications:**
 
+Say we downloaded our publications from our reference manager, such as Zotero, to a file named `my_publications.bib` within the website folder. We can import them into the default `content/publication/` folder with:
+
     academic import --bibtex my_publications.bib
 
 **Import publications to a specific folder (e.g. `content/zh/publication`):**
 
-    academic import --bibtex my_publications.bib --publication-dir "content/zh/publication"
+Say our site has multiple languages, we may want to output the publications to a specific folder with:
+
+    academic import --bibtex my_publications.bib --publication-dir content/zh/publication/
 
 Optional arguments:
 
 * `--publication-dir PUBLICATION_DIR` Folder to import publications to (defaults to `content/publication`)
-* `--overwrite` Overwrite existing publications
-* `--normalize` Normalize tags by converting them to lowercase and capitalizing the first letter
-* `--featured` Flag publications as *featured* (to appear in *Featured Publications* widget)
+* `--overwrite` Overwrite any existing publications in the output folder
+* `--normalize` Normalize tags by converting them to lowercase and capitalizing the first letter (e.g. "sciEnCE" -> "Science")
+* `--featured` Flag these publications as *featured* (to appear in *Featured Publications* widget)
 * `--verbose` or `-v` Show verbose messages
 * `--help` Help
 
@@ -85,6 +89,12 @@ After importing publications, [a full text PDF and image can be associated with 
     academic server
 
 ## Contribute
+
+Interested in contributing to **open source** and **open science**?
+
+Learn [how to contribute code on Github](https://codeburst.io/a-step-by-step-guide-to-making-your-first-github-contribution-5302260a2940).
+
+Check out the [open issues](https://github.com/wowchemy/hugo-academic-cli/issues) and contribute a [Pull Request](https://github.com/wowchemy/hugo-academic-cli/pulls). 
 
 For local development, clone this repository and use Pipenv to install the tool using the following commands:
 
