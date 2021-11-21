@@ -1,4 +1,4 @@
-# Hugo Academic CLI
+# [Hugo Academic CLI](https://github.com/wowchemy/hugo-academic-cli)
 
 [![Download from PyPI](https://img.shields.io/pypi/v/academic.svg)](https://pypi.python.org/pypi/academic)
 [![Download from Anaconda](https://anaconda.org/conda-forge/academic/badges/version.svg)](https://anaconda.org/conda-forge/academic)
