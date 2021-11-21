@@ -24,7 +24,7 @@ To help us develop this Academic CLI tool and the associated Wowchemy software s
 
 Support development of the Academic CLI:
 
-  - ❤️ [Become a **backer** and **unlock rewards**](https://wowchemy.com/sponsor/)
+  - ❤️ [Become a **GitHub Sponsor** and **unlock perks**](https://github.com/sponsors/gcushen)
   - ☕️ [**Donate a coffee**](https://paypal.me/cushen)
   - 👩‍💻 [**Contribute**](#contribute)
 
@@ -65,16 +65,20 @@ Use the `cd` command to navigate to your website folder in the terminal:
 
     academic import --bibtex my_publications.bib
 
+**Import publications to a specific folder (e.g. `content/zh/publication`):**
+
+    academic import --bibtex my_publications.bib --publication-dir "content/zh/publication"
+
 Optional arguments:
 
-* `--help` Help
-* `--featured` Flag publications as *featured* (to appear in *Featured Publications* widget)
+* `--publication-dir PUBLICATION_DIR` Folder to import publications to (defaults to `content/publication`)
 * `--overwrite` Overwrite existing publications
-* `--publication-dir PUBLICATION_DIR` Path to your publications directory (defaults to `publication`)
 * `--normalize` Normalize tags by converting them to lowercase and capitalizing the first letter
+* `--featured` Flag publications as *featured* (to appear in *Featured Publications* widget)
 * `--verbose` or `-v` Show verbose messages
+* `--help` Help
 
-After importing publications, [a full text PDF and image can be associated with each item and further details added via extra parameters](https://wowchemy.com/docs/content/publications/#command-line).
+After importing publications, [a full text PDF and image can be associated with each item and further details added via extra parameters](https://wowchemy.com/docs/content/publications/).
 
 **Run a Hugo command (pass-through):**
 
@@ -99,6 +103,4 @@ Preparing a contribution:
 
 Copyright 2018-present [George Cushen](https://georgecushen.com).
 
-Licensed under the [MIT License](https://github.com/wowchemy/hugo-academic-cli/blob/master/LICENSE.md).
-
-[![Analytics](https://ga-beacon.appspot.com/UA-78646709-2/hugo-academic-cli/readme?pixel)](https://github.com/igrigorik/ga-beacon)
+Licensed under the [MIT License](https://github.com/wowchemy/hugo-academic-cli/blob/main/LICENSE.md).

@@ -18,7 +18,7 @@ from academic.publication_type import PUB_TYPES, PublicationType
 
 
 def import_bibtex(
-    bibtex, pub_dir="publication", featured=False, overwrite=False, normalize=False, dry_run=False,
+    bibtex, pub_dir=os.path.join("content", "publication"), featured=False, overwrite=False, normalize=False, dry_run=False,
 ):
     """Import publications from BibTeX file"""
     from academic.cli import AcademicError, log
@@ -42,14 +42,14 @@ def import_bibtex(
 
 
 def parse_bibtex_entry(
-    entry, pub_dir="publication", featured=False, overwrite=False, normalize=False, dry_run=False,
+    entry, pub_dir=os.path.join("content", "publication"), featured=False, overwrite=False, normalize=False, dry_run=False,
 ):
     """Parse a bibtex entry and generate corresponding publication bundle"""
     from academic.cli import log
 
     log.info(f"Parsing entry {entry['ID']}")
 
-    bundle_path = f"content/{pub_dir}/{slugify(entry['ID'])}"
+    bundle_path = os.path.join(pub_dir, slugify(entry["ID"]))
     markdown_path = os.path.join(bundle_path, "index.md")
     cite_path = os.path.join(bundle_path, "cite.bib")
     date = datetime.utcnow()
@@ -77,7 +77,7 @@ def parse_bibtex_entry(
     # Prepare YAML front matter for Markdown file.
     hugo = utils.hugo_in_docker_or_local()
     if not dry_run:
-        subprocess.call(f"{hugo} new {markdown_path} --kind publication", shell=True)
+        subprocess.call(f"{hugo} new {markdown_path}", shell=True)
         if "docker-compose" in hugo:
             time.sleep(2)
 

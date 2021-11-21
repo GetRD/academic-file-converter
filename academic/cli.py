@@ -42,11 +42,7 @@ def parse_args(args):
     )
     parser_a.add_argument("--bibtex", required=False, type=str, help="File path to your BibTeX file")
     parser_a.add_argument(
-        "--publication-dir",
-        required=False,
-        type=str,
-        default="publication",
-        help="Directory that your publications are stored in (default `publication`)",
+        "--publication-dir", required=False, type=str, default="publication", help="Path to import publications to (default `content/publication`)",
     )
     parser_a.add_argument("--featured", action="store_true", help="Flag publications as featured")
     parser_a.add_argument("--overwrite", action="store_true", help="Overwrite existing publications")
