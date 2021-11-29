@@ -4,6 +4,7 @@ import argparse
 import logging
 import subprocess
 import sys
+import os
 from argparse import RawTextHelpFormatter
 
 from academic import __version__ as version
@@ -42,7 +43,11 @@ def parse_args(args):
     )
     parser_a.add_argument("--bibtex", required=False, type=str, help="File path to your BibTeX file")
     parser_a.add_argument(
-        "--publication-dir", required=False, type=str, default="publication", help="Path to import publications to (default `content/publication`)",
+        "--publication-dir",
+        required=False,
+        type=str,
+        default=os.path.join("content", "publication"),
+        help="Path to import publications to (default `content/publication`)",
     )
     parser_a.add_argument("--featured", action="store_true", help="Flag publications as featured")
     parser_a.add_argument("--overwrite", action="store_true", help="Overwrite existing publications")
