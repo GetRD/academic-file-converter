@@ -2,9 +2,9 @@
 
 import argparse
 import logging
+import os
 import subprocess
 import sys
-import os
 from argparse import RawTextHelpFormatter
 
 from academic import __version__ as version
