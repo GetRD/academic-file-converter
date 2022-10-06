@@ -131,19 +131,30 @@ def parse_bibtex_entry(
     # Publication name.
     if "booktitle" in entry:
         publication = "*" + clean_bibtex_str(entry["booktitle"]) + "*"
-    elif "journal" in entry:
-        publication = "*" + clean_bibtex_str(entry["journal"]) + "*"
+    elif "journaltitle" in entry:
+        publication = "*" + clean_bibtex_str(entry["journaltitle"]) + "*"
     elif "publisher" in entry:
         publication = "*" + clean_bibtex_str(entry["publisher"]) + "*"
     else:
         publication = ""
-    page.fm["publication"] = publication
+
+    if "volume" in entry:
+        publication += ", Vol. " + clean_bibtex_str(entry["volume"])
+
+    if "number" in entry: 
+        publication += ", No. " + clean_bibtex_str(entry["number"])
+
+    if "pages" in entry:
+        publication += ", PP. " + clean_bibtex_str(entry["pages"])
 
     if "keywords" in entry:
         page.fm["tags"] = clean_bibtex_tags(entry["keywords"], normalize)
 
     if "doi" in entry:
+        publication += ", DOI: " + clean_bibtex_str(entry["doi"])
         page.fm["doi"] = clean_bibtex_str(entry["doi"])
+
+    page.fm["publication"] = publication
 
     links = []
     if all(f in entry for f in ["archiveprefix", "eprint"]) and entry["archiveprefix"].lower() == "arxiv":
