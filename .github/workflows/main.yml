@@ -24,10 +24,10 @@ jobs:
       - name: Run a one-line script
         uses: shimataro/ssh-key-action@v2
         with:
-          key: ${{secrets.SSH_PRIVATE_KEY}}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           name: id_rsa
           known_hosts: ${{secrets.SSH_HOST}}
 
       # Runs a set of commands using the runners shell
       - name: Pull
-        run: ssh aruz@vgirtel.upct.es "cd /home/aruz/hugo-academic-cli-girtel && git pull"
+        run: ssh git-user@vgirtel.upct.es "cd /home/aruz/hugo-academic-cli-girtel && git pull"
