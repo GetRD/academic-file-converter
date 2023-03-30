@@ -160,6 +160,12 @@ def parse_bibtex_entry(
     if links:
         page.fm["links"] = links
 
+    if "note" in entry:
+        page.fm["note"] = clean_bibtex_str(entry["note"])
+
+    if "annote" in entry:
+        page.fm["annote"] = clean_bibtex_str(entry["annote"])
+
     # Save Markdown file.
     try:
         log.info(f"Saving Markdown to '{markdown_path}'")
