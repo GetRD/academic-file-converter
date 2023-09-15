@@ -1,14 +1,14 @@
 .PHONY: black lint test publish
 
 format:
-	isort --profile black .
-	black .
+	poetry run isort --profile black .
+	poetry run black .
 
 lint:
-	flake8
+	poetry run flake8
 
 test:
-	python -m pytest
+	poetry run pytest
 
 publish:
-	python setup.py publish
+	poetry publish --build --dry-run

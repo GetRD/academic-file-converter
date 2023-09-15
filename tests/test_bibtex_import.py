@@ -5,7 +5,7 @@ import bibtexparser
 from bibtexparser.bparser import BibTexParser
 
 from academic import cli, import_bibtex
-from academic.editFM import EditableFM
+from academic.generate_markdown import EditableFM
 
 bibtex_dir = Path(__file__).parent / "data"
 

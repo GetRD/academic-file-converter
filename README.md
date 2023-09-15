@@ -34,9 +34,9 @@ Support development of the Academic CLI:
 
 ## Prerequisites
 
-1. Install [Python 3.6+](https://realpython.com/installing-python/) if it’s not already installed
+1. Install [Python 3.11+](https://realpython.com/installing-python/) if it’s not already installed
 
-### Additional prerequisites only if you are creating a website with Hugo
+### For Building a Website with Hugo (Optional)
 
 1. Create a [Hugo](https://gohugo.io) website such as by using the [Hugo Academic Starter](https://github.com/wowchemy/starter-hugo-academic) template for the [Wowchemy](https://wowchemy.com) website builder
 1. [Download your site from GitHub, installing Hugo and its dependencies](https://wowchemy.com/docs/getting-started/install-hugo-extended/)
@@ -49,24 +49,18 @@ Support development of the Academic CLI:
 Open your Terminal or Command Prompt app and install the Academic CLI tool:
 
     pip3 install -U academic
-
-Alternatively, install Academic CLI v0.5.1 if you do not wish to install Hugo on your computer:
-
-    pip3 install academic==0.5.1
     
-Or, help test the lastest development version:
+Or, help test the latest development version:
 
     pip3 install -U git+https://github.com/wowchemy/hugo-academic-cli.git
 
 ## Usage
 
-Use the `cd` command to navigate to your website folder in the terminal:
+Download references from your reference manager, such as Zotero, in the Bibtex format.
 
-    cd <MY_WEBSITE_FOLDER>
+Use the `cd` command to navigate to the folder containing your Bibtex file:
 
-**Help:**
-
-    academic
+    cd <MY_BIBTEX_FOLDER>
 
 **Import publications:**
 
@@ -91,10 +85,6 @@ Optional arguments:
 
 After importing publications, [a full text PDF and image can be associated with each item and further details added via extra parameters](https://wowchemy.com/docs/content/publications/).
 
-**Run a Hugo command (pass-through):**
-
-    academic server
-
 ## Contribute
 
 Interested in contributing to **open source** and **open science**?
@@ -105,10 +95,10 @@ Check out the [open issues](https://github.com/wowchemy/hugo-academic-cli/issues
 
 For local development, clone this repository and use Pipenv to install the tool using the following commands:
 
-    git clone https://github.com/wowchemy/hugo-academic-cli.git
-    cd hugo-academic-cli
-    pip3 install pipenv
-    pipenv install -e .
+    git clone https://github.com/wowchemy/bibtex-to-markdown.git
+    cd bibtex-to-markdown
+    poetry install
+    poetry run academic import --bibtex=tests/data/article.bib --publication-dir=debug --overwrite
 
 Preparing a contribution:
 
