@@ -29,10 +29,10 @@ jobs:
         pipenv run pytest
     - name: Formatting checks
       run: |
-        pipenv run isort --profile black --recursive --diff .
+        pipenv run isort --profile black --diff .
         pipenv run black --check .
-    - name: Report Coverage
-      if: matrix.python-version == '3.11'
-      uses: codecov/codecov-action@v3
-      with:
-        verbose: true
+    # - name: Report Coverage
+    #   if: matrix.python-version == '3.11'
+    #   uses: codecov/codecov-action@v3
+    #   with:
+    #     verbose: true
