@@ -1,8 +1,6 @@
 import calendar
 import os
 import re
-import subprocess
-import time
 from datetime import datetime
 from pathlib import Path
 
@@ -12,13 +10,17 @@ from bibtexparser.bparser import BibTexParser
 from bibtexparser.bwriter import BibTexWriter
 from bibtexparser.customization import convert_to_unicode
 
-from academic import utils
-from academic.editFM import EditableFM
+from academic.generate_markdown import EditableFM
 from academic.publication_type import PUB_TYPES, PublicationType
 
 
 def import_bibtex(
-    bibtex, pub_dir=os.path.join("content", "publication"), featured=False, overwrite=False, normalize=False, dry_run=False,
+    bibtex,
+    pub_dir=os.path.join("content", "publication"),
+    featured=False,
+    overwrite=False,
+    normalize=False,
+    dry_run=False,
 ):
     """Import publications from BibTeX file"""
     from academic.cli import AcademicError, log
@@ -37,12 +39,22 @@ def import_bibtex(
         bib_database = bibtexparser.load(bibtex_file, parser=parser)
         for entry in bib_database.entries:
             parse_bibtex_entry(
-                entry, pub_dir=pub_dir, featured=featured, overwrite=overwrite, normalize=normalize, dry_run=dry_run,
+                entry,
+                pub_dir=pub_dir,
+                featured=featured,
+                overwrite=overwrite,
+                normalize=normalize,
+                dry_run=dry_run,
             )
 
 
 def parse_bibtex_entry(
-    entry, pub_dir=os.path.join("content", "publication"), featured=False, overwrite=False, normalize=False, dry_run=False,
+    entry,
+    pub_dir=os.path.join("content", "publication"),
+    featured=False,
+    overwrite=False,
+    normalize=False,
+    dry_run=False,
 ):
     """Parse a bibtex entry and generate corresponding publication bundle"""
     from academic.cli import log
@@ -75,11 +87,17 @@ def parse_bibtex_entry(
             f.write(writer.write(db))
 
     # Prepare YAML front matter for Markdown file.
-    hugo = utils.hugo_in_docker_or_local()
     if not dry_run:
-        subprocess.call(f"{hugo} new {markdown_path}", shell=True)
-        if "docker-compose" in hugo:
-            time.sleep(2)
+        from importlib import resources as impresources
+
+        from academic import templates
+
+        inp_file = impresources.files(templates) / "publication.md"
+        with inp_file.open("rt") as f:
+            template = f.read()
+
+        with open(markdown_path, "w") as f:
+            f.write(template)
 
     page = EditableFM(Path(bundle_path), dry_run=dry_run)
     page.load(Path("index.md"))
