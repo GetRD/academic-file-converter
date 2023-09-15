@@ -8,12 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8]
+        python-version: [3.11]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -32,5 +32,7 @@ jobs:
         pipenv run isort --profile black --recursive --diff .
         pipenv run black --check .
     - name: Report Coverage
-      if: matrix.python-version == '3.8'
-      uses: codecov/codecov-action@v1.0.6
+      if: matrix.python-version == '3.11'
+      uses: codecov/codecov-action@v3
+      with:
+        verbose: true
