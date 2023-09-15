@@ -1,7 +1,6 @@
 # [Bibtex to Markdown Converter](https://github.com/wowchemy/bibtex-to-markdown)
 
 [![Download from PyPI](https://img.shields.io/pypi/v/academic.svg?style=for-the-badge)](https://pypi.python.org/pypi/academic)
-[![Conda](https://img.shields.io/conda/v/conda-forge/academic?label=CONDA&style=for-the-badge)](https://anaconda.org/conda-forge/academic)
 [![Discord](https://img.shields.io/discord/722225264733716590?style=for-the-badge)](https://discord.com/channels/722225264733716590/742892432458252370/742895548159492138)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/gcushen?label=%E2%9D%A4%EF%B8%8F%20sponsor&style=for-the-badge)](https://github.com/sponsors/gcushen)
 [![Twitter Follow](https://img.shields.io/twitter/follow/georgecushen?label=Follow%20on%20Twitter&style=for-the-badge)](https://twitter.com/GeorgeCushen)
@@ -113,5 +112,4 @@ Copyright 2018-present [George Cushen](https://georgecushen.com).
 Licensed under the [MIT License](https://github.com/wowchemy/bibtex-to-markdown/blob/main/LICENSE.md).
 
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/academic?label=PyPi%20Downloads&style=for-the-badge)
-![Conda](https://img.shields.io/conda/dn/conda-forge/academic?label=Conda%20Downloads&style=for-the-badge)
 [![License](https://img.shields.io/pypi/l/academic.svg?style=for-the-badge)](https://github.com/wowchemy/bibtex-to-markdown/blob/main/LICENSE.md)
