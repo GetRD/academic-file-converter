@@ -92,7 +92,7 @@ Learn [how to contribute code on Github](https://codeburst.io/a-step-by-step-gui
 
 Check out the [open issues](https://github.com/wowchemy/hugo-academic-cli/issues) and contribute a [Pull Request](https://github.com/wowchemy/hugo-academic-cli/pulls). 
 
-For local development, clone this repository and use Pipenv to install the tool using the following commands:
+For local development, clone this repository and use Poetry to install and run the converter using the following commands:
 
     git clone https://github.com/wowchemy/bibtex-to-markdown.git
     cd bibtex-to-markdown
