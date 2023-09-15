@@ -1,4 +1,4 @@
-# [Hugo Academic CLI](https://github.com/wowchemy/hugo-academic-cli)
+# [Bibtex to Markdown Converter](https://github.com/wowchemy/bibtex-to-markdown)
 
 [![Download from PyPI](https://img.shields.io/pypi/v/academic.svg?style=for-the-badge)](https://pypi.python.org/pypi/academic)
 [![Conda](https://img.shields.io/conda/v/conda-forge/academic?label=CONDA&style=for-the-badge)](https://anaconda.org/conda-forge/academic)
@@ -8,13 +8,13 @@
 [![GitHub followers](https://img.shields.io/github/followers/gcushen?label=Follow%20on%20GH&style=for-the-badge)](https://github.com/gcushen)  
 
 
-### 📚 Import publications from your reference manager to [Hugo](https://gohugo.io/)
+### 📚 Easily import publications from your reference manager to your Markdown-formatted website or book
 
 **Features**
 
-* Import publications, including **books, conference proceedings and journals**, from your reference manager to your static site generator
-  * Simply export a BibTeX file from your reference manager, such as [Zotero](https://www.zotero.org), and provide this as the input
-* Hugo command pass-through
+* Import Bibtex publications (such as **books, conference proceedings and journals**) from your reference manager to your Markdown-formatted website or book
+  * Simply export a BibTeX file from your reference manager, such as [Zotero](https://www.zotero.org), and provide this as the input to the converter tool
+* Compatible with all static website generators such as Next, Astro, Gatsby, Hugo, etc.
 
 **Community**
 
@@ -24,19 +24,22 @@
 
 **❤️ Support this open-source software**
 
-To help us develop this Academic CLI tool and the associated Wowchemy software sustainably under the MIT license, we ask all individuals and businesses that use it to help support its ongoing maintenance and development via sponsorship and contributing.
+To help us develop this converter tool and the associated Wowchemy software sustainably under the MIT license, we ask all individuals and businesses that use it to help support its ongoing maintenance and development via sponsorship and contributing.
 
 Support development of the Academic CLI:
 
   - ❤️ [Become a **GitHub Sponsor** and **unlock perks**](https://github.com/sponsors/gcushen)
-  - ☕️ [**Donate a coffee**](https://paypal.me/cushen)
+  - ☕️ [**Donate a coffee**](https://github.com/sponsors/gcushen)
   - 👩‍💻 [**Contribute**](#contribute)
 
 ## Prerequisites
 
+1. Install [Python 3.6+](https://realpython.com/installing-python/) if it’s not already installed
+
+### Additional prerequisites only if you are creating a website with Hugo
+
 1. Create a [Hugo](https://gohugo.io) website such as by using the [Hugo Academic Starter](https://github.com/wowchemy/starter-hugo-academic) template for the [Wowchemy](https://wowchemy.com) website builder
 1. [Download your site from GitHub, installing Hugo and its dependencies](https://wowchemy.com/docs/getting-started/install-hugo-extended/)
-1. Install [Python 3.6+](https://realpython.com/installing-python/) if it’s not already installed
 1. [Version control](https://guides.github.com/introduction/git-handbook/#version-control) your website
    - Ideally, version control your site with [Git](http://rogerdudler.github.io/git-guide/) so that you can review the proposed changes and accept or reject them without risking breaking your site
    - Otherwise, if not using Git, **backup your site folder** prior to running this tool
@@ -117,8 +120,8 @@ Preparing a contribution:
 
 Copyright 2018-present [George Cushen](https://georgecushen.com).
 
-Licensed under the [MIT License](https://github.com/wowchemy/hugo-academic-cli/blob/main/LICENSE.md).
+Licensed under the [MIT License](https://github.com/wowchemy/bibtex-to-markdown/blob/main/LICENSE.md).
 
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/academic?label=PyPi%20Downloads&style=for-the-badge)
 ![Conda](https://img.shields.io/conda/dn/conda-forge/academic?label=Conda%20Downloads&style=for-the-badge)
-[![License](https://img.shields.io/pypi/l/academic.svg?style=for-the-badge)](https://github.com/wowchemy/hugo-academic-cli/blob/main/LICENSE.md)
+[![License](https://img.shields.io/pypi/l/academic.svg?style=for-the-badge)](https://github.com/wowchemy/bibtex-to-markdown/blob/main/LICENSE.md)
