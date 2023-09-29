@@ -32,7 +32,7 @@ def parse_args(args):
     # Initialise command parser.
     version = importlib.metadata.version("academic")
     parser = argparse.ArgumentParser(
-        description=f"Hugo Academic CLI v{version}\nhttps://github.com/wowchemy/bibtex-to-markdown",
+        description=f"Academic CLI v{version}\nhttps://github.com/wowchemy/bibtex-to-markdown",
         formatter_class=RawTextHelpFormatter,
     )
     subparsers = parser.add_subparsers(help="Sub-commands", dest="command")
