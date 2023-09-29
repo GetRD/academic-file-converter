@@ -39,11 +39,6 @@ def parse_args(args):
 
     # Sub-parser for import command.
     parser_a = subparsers.add_parser("import", help="Import data into Academic")
-    parser_a.add_argument(
-        "--assets",
-        action="store_true",
-        help="Import third-party JS and CSS for generating an offline site",
-    )
     parser_a.add_argument("--bibtex", required=False, type=str, help="File path to your BibTeX file")
     parser_a.add_argument(
         "--publication-dir",
