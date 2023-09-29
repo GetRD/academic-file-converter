@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 import argparse
+import importlib.metadata
 import logging
 import os
 import sys
 from argparse import RawTextHelpFormatter
 
 from academic.import_bibtex import import_bibtex
-from academic.version import VERSION
 
 # Initialise logger.
 logging.basicConfig(
@@ -30,8 +30,9 @@ def parse_args(args):
     """Parse command-line arguments"""
 
     # Initialise command parser.
+    version = importlib.metadata.version("academic")
     parser = argparse.ArgumentParser(
-        description=f"Hugo Academic CLI v{VERSION}\nhttps://github.com/wowchemy/bibtex-to-markdown",
+        description=f"Hugo Academic CLI v{version}\nhttps://github.com/wowchemy/bibtex-to-markdown",
         formatter_class=RawTextHelpFormatter,
     )
     subparsers = parser.add_subparsers(help="Sub-commands", dest="command")
