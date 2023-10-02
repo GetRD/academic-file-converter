@@ -1,34 +1,18 @@
-from enum import Enum
-
-
-# Map BibTeX to Academic publication types.
-class PublicationType(Enum):
-    Uncategorized = 0
-    ConferencePaper = 1
-    JournalArticle = 2
-    Preprint = 3
-    Report = 4
-    Book = 5
-    BookSection = 6
-    Thesis = 7  # (v4.2+ required)
-    Patent = 8  # (v4.2+ required)
-
-
-PUB_TYPES = {
-    "article": PublicationType.JournalArticle,
-    "book": PublicationType.Book,
-    "conference": PublicationType.ConferencePaper,
-    "inbook": PublicationType.BookSection,
-    "incollection": PublicationType.BookSection,
-    "inproceedings": PublicationType.ConferencePaper,
-    "manual": PublicationType.Report,
-    "mastersthesis": PublicationType.Thesis,
-    "misc": PublicationType.Uncategorized,
-    "patent": PublicationType.Patent,
-    "phdthesis": PublicationType.Thesis,
-    "proceedings": PublicationType.Uncategorized,
-    "report": PublicationType.Report,
-    "thesis": PublicationType.Thesis,
-    "techreport": PublicationType.Report,
-    "unpublished": PublicationType.Preprint,
+# Map BibTeX publication types to universal CSL types
+PUB_TYPES_BIBTEX_TO_CSL = {
+    "article": "article-journal",
+    "book": "book",
+    "conference": "paper-conference",
+    "inbook": "chapter",
+    "incollection": "chapter",
+    "inproceedings": "paper-conference",
+    "manual": "book",
+    "mastersthesis": "thesis",
+    "patent": "patent",
+    "phdthesis": "thesis",
+    "proceedings": "book",
+    "report": "report",
+    "thesis": "thesis",
+    "techreport": "report",
+    "unpublished": "manuscript",
 }
