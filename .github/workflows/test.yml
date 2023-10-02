@@ -1,4 +1,4 @@
-name: Test, lint, format
+name: Test, lint, format, type check
 
 on: [push, pull_request]
 
@@ -31,6 +31,9 @@ jobs:
       run: |
         poetry run isort --profile black --diff .
         poetry run black --check .
+    - name: Type checks
+      run: |
+        poetry run pyright
     # - name: Report Coverage
     #   if: matrix.python-version == '3.11'
     #   uses: codecov/codecov-action@v3
