@@ -3,7 +3,6 @@
 import argparse
 import importlib.metadata
 import logging
-import os
 import sys
 from argparse import RawTextHelpFormatter
 
@@ -18,12 +17,9 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 
-class AcademicError(Exception):
-    pass
-
-
 def main():
-    parse_args(sys.argv[1:])  # Strip command name, leave just args.
+    # Strip command name (currently `academic`) and feed arguments to the parser
+    parse_args(sys.argv[1:])
 
 
 def parse_args(args):
@@ -38,17 +34,12 @@ def parse_args(args):
     subparsers = parser.add_subparsers(help="Sub-commands", dest="command")
 
     # Sub-parser for import command.
-    parser_a = subparsers.add_parser("import", help="Import data into Academic")
-    parser_a.add_argument("--bibtex", required=False, type=str, help="File path to your BibTeX file")
-    parser_a.add_argument(
-        "--publication-dir",
-        required=False,
-        type=str,
-        default=os.path.join("content", "publication"),
-        help="Path to import publications to (default `content/publication`)",
-    )
+    parser_a = subparsers.add_parser("import", help="Import content into your website or book")
+    parser_a.add_argument("input", type=str, help="File path to your BibTeX file")
+    parser_a.add_argument("output", type=str, help="Path to import publications to (e.g. `content/publication/`)")
     parser_a.add_argument("--featured", action="store_true", help="Flag publications as featured")
     parser_a.add_argument("--overwrite", action="store_true", help="Overwrite existing publications")
+    parser_a.add_argument("--compact", action="store_true", help="Generate minimal markdown")
     parser_a.add_argument(
         "--normalize",
         action="store_true",
@@ -71,17 +62,19 @@ def parse_args(args):
         parser.exit()
     else:
         # The command has been recognised, proceed to parse it.
-        if known_args.command and known_args.verbose:
-            # Set logging level to debug if verbose mode activated.
-            logging.getLogger().setLevel(logging.DEBUG)
-        elif known_args.command and known_args.bibtex:
+        if known_args.command:
+            if known_args.verbose:
+                # Set logging level to debug if verbose mode activated.
+                logging.getLogger().setLevel(logging.DEBUG)
+
             # Run command to import bibtex.
             import_bibtex(
-                known_args.bibtex,
-                pub_dir=known_args.publication_dir,
+                known_args.input,
+                pub_dir=known_args.output,
                 featured=known_args.featured,
                 overwrite=known_args.overwrite,
                 normalize=known_args.normalize,
+                compact=known_args.compact,
                 dry_run=known_args.dry_run,
             )
 

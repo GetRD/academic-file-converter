@@ -18,40 +18,37 @@
 **Community**
 
 - 📚 [View the **documentation**](https://wowchemy.com/docs/content/publications/#import-from-bibtex) and usage guide below
-- 💬 [Chat with the **Wowchemy community**](https://discord.gg/z8wNYzb) or [**Hugo community**](https://discourse.gohugo.io)
+- 💬 [Chat with the **community**](https://discord.gg/z8wNYzb)
 - 🐦 Twitter: [@wowchemy](https://twitter.com/wowchemy) [@GeorgeCushen](https://twitter.com/GeorgeCushen) [#MadeWithAcademic](https://twitter.com/search?q=(%23MadeWithWowchemy%20OR%20%23MadeWithAcademic)&src=typed_query)
 
 **❤️ Support this open-source software**
 
-To help us develop this converter tool and the associated Wowchemy software sustainably under the MIT license, we ask all individuals and businesses that use it to help support its ongoing maintenance and development via sponsorship and contributing.
+To help us develop this converter tool and the associated Wowchemy open source software sustainably under the MIT license, we ask all individuals and businesses that use it to help support its ongoing maintenance and development via sponsorship and contributing.
 
-Support development of the Academic CLI:
+Support this open science movement:
 
+  - ⭐️ [**Star** this project on GitHub](https://github.com/wowchemy/bibtex-to-markdown)
   - ❤️ [Become a **GitHub Sponsor** and **unlock perks**](https://github.com/sponsors/gcushen)
   - ☕️ [**Donate a coffee**](https://github.com/sponsors/gcushen)
   - 👩‍💻 [**Contribute**](#contribute)
 
-## Prerequisites
-
-1. Install [Python 3.11+](https://realpython.com/installing-python/) if it’s not already installed
-
-### For Building a Website with Hugo (Optional)
-
-1. Create a [Hugo](https://gohugo.io) website such as by using the [Hugo Academic Starter](https://github.com/wowchemy/starter-hugo-academic) template for the [Wowchemy](https://wowchemy.com) website builder
-1. [Download your site from GitHub, installing Hugo and its dependencies](https://wowchemy.com/docs/getting-started/install-hugo-extended/)
-1. [Version control](https://guides.github.com/introduction/git-handbook/#version-control) your website
-   - Ideally, version control your site with [Git](http://rogerdudler.github.io/git-guide/) so that you can review the proposed changes and accept or reject them without risking breaking your site
-   - Otherwise, if not using Git, **backup your site folder** prior to running this tool
-
 ## Installation
 
-Open your Terminal or Command Prompt app and install the Academic CLI tool:
+Open your **Terminal** or **Command Prompt** app and enter one of the installation commands below.
+
+### With Pipx
+
+For the **easiest** installation, install with [Pipx](https://pypa.github.io/pipx/): 
+
+    pipx install academic
+
+Pipx will **automatically install the required Python version for you** in a dedicated environment.
+
+### With Pip
+
+ To install using the Python's Pip tool, ensure you have [Python 3.11+](https://realpython.com/installing-python/) installed and then run:
 
     pip3 install -U academic
-    
-Or, help test the latest development version:
-
-    pip3 install -U git+https://github.com/wowchemy/hugo-academic-cli.git
 
 ## Usage
 
@@ -61,28 +58,24 @@ Use the `cd` command to navigate to the folder containing your Bibtex file:
 
     cd <MY_BIBTEX_FOLDER>
 
-**Import publications:**
+### Import publications
 
-Say we downloaded our publications from our reference manager, such as Zotero, to a file named `my_publications.bib` within the website folder. We can import them into the default `content/publication/` folder with:
+Say we downloaded our publications to a file named `my_publications.bib` within the website folder, let's import them into the `content/publication/` folder:
 
-    academic import --bibtex my_publications.bib
-
-**Import publications to a specific folder (e.g. `content/zh/publication`):**
-
-Say our site has multiple languages, we may want to output the publications to a specific folder with:
-
-    academic import --bibtex my_publications.bib --publication-dir content/zh/publication/
+    academic import my_publications.bib content/publication/ --compact
 
 Optional arguments:
 
-* `--publication-dir PUBLICATION_DIR` Folder to import publications to (defaults to `content/publication`)
+* `--compact` Generate minimal markdown without comments or empty keys
 * `--overwrite` Overwrite any existing publications in the output folder
 * `--normalize` Normalize tags by converting them to lowercase and capitalizing the first letter (e.g. "sciEnCE" -> "Science")
-* `--featured` Flag these publications as *featured* (to appear in *Featured Publications* widget)
+* `--featured` Flag these publications as *featured* (to appear in your website's *Featured Publications* section)
 * `--verbose` or `-v` Show verbose messages
 * `--help` Help
 
-After importing publications, [a full text PDF and image can be associated with each item and further details added via extra parameters](https://wowchemy.com/docs/content/publications/).
+### Import full text and cover image
+
+After importing publications, [a full text and image can be associated with each item and further details added via extra parameters](https://wowchemy.com/docs/content/publications/).
 
 ## Contribute
 
@@ -97,13 +90,20 @@ For local development, clone this repository and use Poetry to install and run t
     git clone https://github.com/wowchemy/bibtex-to-markdown.git
     cd bibtex-to-markdown
     poetry install
-    poetry run academic import --bibtex=tests/data/article.bib --publication-dir=debug --overwrite
+    poetry run academic import tests/data/article.bib output/ --overwrite --compact
 
-Preparing a contribution:
+When preparing a contribution, run the following checks and ensure that they all pass:
 
 - Lint: `make lint`
 - Format: `make format`
 - Test: `make test`
+- Type check: `make type`
+- 
+### Help beta test the dev version
+
+You can help test the latest development version by installing the latest `main` branch from GitHub:
+
+    pip3 install -U git+https://github.com/wowchemy/bibtex-to-markdown.git
 
 ## License
 

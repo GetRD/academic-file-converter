@@ -10,8 +10,8 @@ from bibtexparser.bparser import BibTexParser
 from bibtexparser.bwriter import BibTexWriter
 from bibtexparser.customization import convert_to_unicode
 
-from academic.generate_markdown import EditableFM
-from academic.publication_type import PUB_TYPES, PublicationType
+from academic.generate_markdown import GenerateMarkdown
+from academic.publication_type import PUB_TYPES_BIBTEX_TO_CSL
 
 
 def import_bibtex(
@@ -20,10 +20,12 @@ def import_bibtex(
     featured=False,
     overwrite=False,
     normalize=False,
+    compact=False,
     dry_run=False,
 ):
     """Import publications from BibTeX file"""
-    from academic.cli import AcademicError, log
+    from academic.cli import log
+    from academic.utils import AcademicError
 
     # Check BibTeX file exists.
     if not Path(bibtex).is_file():
@@ -44,6 +46,7 @@ def import_bibtex(
                 featured=featured,
                 overwrite=overwrite,
                 normalize=normalize,
+                compact=compact,
                 dry_run=dry_run,
             )
 
@@ -54,6 +57,7 @@ def parse_bibtex_entry(
     featured=False,
     overwrite=False,
     normalize=False,
+    compact=False,
     dry_run=False,
 ):
     """Parse a bibtex entry and generate corresponding publication bundle"""
@@ -90,32 +94,31 @@ def parse_bibtex_entry(
     if not dry_run:
         from importlib import resources as impresources
 
-        from academic import templates
-
-        inp_file = impresources.files(templates) / "publication.md"
+        # Load the Markdown template from within the `templates` folder of the `academic` package
+        inp_file = impresources.files(__package__ + ".templates") / "publication.md"
         with inp_file.open("rt") as f:
             template = f.read()
 
         with open(markdown_path, "w") as f:
             f.write(template)
 
-    page = EditableFM(Path(bundle_path), dry_run=dry_run)
+    page = GenerateMarkdown(Path(bundle_path), dry_run=dry_run, compact=compact)
     page.load(Path("index.md"))
 
-    page.fm["title"] = clean_bibtex_str(entry["title"])
+    page.yaml["title"] = clean_bibtex_str(entry["title"])
 
     if "subtitle" in entry:
-        page.fm["subtitle"] = clean_bibtex_str(entry["subtitle"])
+        page.yaml["subtitle"] = clean_bibtex_str(entry["subtitle"])
 
     year, month, day = "", "01", "01"
     if "date" in entry:
-        dateparts = entry["date"].split("-")
-        if len(dateparts) == 3:
-            year, month, day = dateparts[0], dateparts[1], dateparts[2]
-        elif len(dateparts) == 2:
-            year, month = dateparts[0], dateparts[1]
-        elif len(dateparts) == 1:
-            year = dateparts[0]
+        date_parts = entry["date"].split("-")
+        if len(date_parts) == 3:
+            year, month, day = date_parts[0], date_parts[1], date_parts[2]
+        elif len(date_parts) == 2:
+            year, month = date_parts[0], date_parts[1]
+        elif len(date_parts) == 1:
+            year = date_parts[0]
     if "month" in entry and month == "01":
         month = month2number(entry["month"])
     if "year" in entry and year == "":
@@ -123,8 +126,8 @@ def parse_bibtex_entry(
     if len(year) == 0:
         log.error(f'Invalid date for entry `{entry["ID"]}`.')
 
-    page.fm["date"] = "-".join([year, month, day])
-    page.fm["publishDate"] = timestamp
+    page.yaml["date"] = f"{year}-{month}-{day}"
+    page.yaml["publishDate"] = timestamp
 
     authors = None
     if "author" in entry:
@@ -134,19 +137,22 @@ def parse_bibtex_entry(
 
     if authors:
         authors = clean_bibtex_authors([i.strip() for i in authors.replace("\n", " ").split(" and ")])
-        page.fm["authors"] = authors
+        page.yaml["authors"] = authors
 
-    pubtype = PUB_TYPES.get(entry["ENTRYTYPE"], PublicationType.Uncategorized)
-    page.fm["publication_types"] = [str(pubtype.value)]
+    # Convert Bibtex publication type to the universal CSL standard, defaulting to `manuscript`
+    default_csl_type = "manuscript"
+    pub_type = PUB_TYPES_BIBTEX_TO_CSL.get(entry["ENTRYTYPE"], default_csl_type)
+    page.yaml["publication_types"] = [pub_type]
 
     if "abstract" in entry:
-        page.fm["abstract"] = clean_bibtex_str(entry["abstract"])
+        page.yaml["abstract"] = clean_bibtex_str(entry["abstract"])
     else:
-        page.fm["abstract"] = ""
+        page.yaml["abstract"] = ""
 
-    page.fm["featured"] = featured
+    page.yaml["featured"] = featured
 
     # Publication name.
+    # This field is Markdown formatted, wrapping the publication name in `*` for italics
     if "booktitle" in entry:
         publication = "*" + clean_bibtex_str(entry["booktitle"]) + "*"
     elif "journal" in entry:
@@ -155,13 +161,13 @@ def parse_bibtex_entry(
         publication = "*" + clean_bibtex_str(entry["publisher"]) + "*"
     else:
         publication = ""
-    page.fm["publication"] = publication
+    page.yaml["publication"] = publication
 
     if "keywords" in entry:
-        page.fm["tags"] = clean_bibtex_tags(entry["keywords"], normalize)
+        page.yaml["tags"] = clean_bibtex_tags(entry["keywords"], normalize)
 
     if "doi" in entry:
-        page.fm["doi"] = clean_bibtex_str(entry["doi"])
+        page.yaml["doi"] = clean_bibtex_str(entry["doi"])
 
     links = []
     if all(f in entry for f in ["archiveprefix", "eprint"]) and entry["archiveprefix"].lower() == "arxiv":
@@ -171,12 +177,12 @@ def parse_bibtex_entry(
         sane_url = clean_bibtex_str(entry["url"])
 
         if sane_url[-4:].lower() == ".pdf":
-            page.fm["url_pdf"] = sane_url
+            page.yaml["url_pdf"] = sane_url
         else:
             links += [{"name": "URL", "url": sane_url}]
 
     if links:
-        page.fm["links"] = links
+        page.yaml["links"] = links
 
     # Save Markdown file.
     try:
@@ -267,4 +273,4 @@ def month2number(month):
         try:
             return str(list(calendar.month_abbr).index(month_abbr)).zfill(2)
         except ValueError:
-            raise log.error("Please update the entry with a valid month.")
+            log.error("Please update the entry with a valid month.")

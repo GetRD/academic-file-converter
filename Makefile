@@ -1,4 +1,4 @@
-.PHONY: black lint test publish
+.PHONY: black lint test type publish
 
 format:
 	poetry run isort --profile black .
@@ -9,6 +9,9 @@ lint:
 
 test:
 	poetry run pytest
+
+type:
+	poetry run pyright
 
 publish:
 	poetry publish --build --dry-run
