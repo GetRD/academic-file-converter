@@ -9,6 +9,8 @@
 
 ### 📚 Easily import publications from your reference manager to your Markdown-formatted website or book
 
+![](.github/media/demo.gif)
+
 **Features**
 
 * Import Bibtex publications (such as **books, conference proceedings and journals**) from your reference manager to your Markdown-formatted website or book
