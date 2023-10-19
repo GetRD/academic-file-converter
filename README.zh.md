@@ -1,3 +1,5 @@
+[**English**](./README.md)
+
 # [Bibtex 转 Markdown 转换器](https://github.com/wowchemy/bibtex-to-markdown)
 
 [![从PyPI下载](https://img.shields.io/pypi/v/academic.svg?style=for-the-badge)](https://pypi.python.org/pypi/academic)
