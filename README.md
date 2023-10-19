@@ -31,7 +31,7 @@ Support this open science movement:
 
   - ⭐️ [**Star** this project on GitHub](https://github.com/wowchemy/bibtex-to-markdown)
   - ❤️ [Become a **GitHub Sponsor** and **unlock perks**](https://github.com/sponsors/gcushen)
-  - ☕️ [**Donate a coffee**](https://github.com/sponsors/gcushen)
+  - ☕️ [**Donate a coffee**](https://github.com/sponsors/gcushen?frequency=one-time)
   - 👩‍💻 [**Contribute**](#contribute)
 
 ## Installation
@@ -77,7 +77,12 @@ Optional arguments:
 
 ### Import full text and cover image
 
-After importing publications, [a full text and image can be associated with each item and further details added via extra parameters](https://wowchemy.com/docs/content/publications/).
+After importing publications, we suggest you:
+- Edit the Markdown body of each publication to add the full text directly to the page (if the publication is open access), or otherwise, to add supplementary notes for each publication
+- Add an image named `featured` to each publication's folder to visually represent your publication on the page and for sharing on social media
+- Add the publication PDF to each publication folder (for open access publications), to enable your website visitors to download your publication
+  
+[Learn more in the Wowchemy Docs](https://university.wowchemy.com).
 
 ## Contribute
 
@@ -85,7 +90,7 @@ Interested in contributing to **open source** and **open science**?
 
 Learn [how to contribute code on Github](https://codeburst.io/a-step-by-step-guide-to-making-your-first-github-contribution-5302260a2940).
 
-Check out the [open issues](https://github.com/wowchemy/hugo-academic-cli/issues) and contribute a [Pull Request](https://github.com/wowchemy/hugo-academic-cli/pulls). 
+Check out the [open issues](https://github.com/wowchemy/bibtex-to-markdown/issues) and contribute a [Pull Request](https://github.com/wowchemy/bibtex-to-markdown/pulls). 
 
 For local development, clone this repository and use Poetry to install and run the converter using the following commands:
 
@@ -100,7 +105,7 @@ When preparing a contribution, run the following checks and ensure that they all
 - Format: `make format`
 - Test: `make test`
 - Type check: `make type`
-- 
+
 ### Help beta test the dev version
 
 You can help test the latest development version by installing the latest `main` branch from GitHub:
