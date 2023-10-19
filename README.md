@@ -1,3 +1,5 @@
+[**中文**](./README.zh.md)
+
 # [Bibtex to Markdown Converter](https://github.com/wowchemy/bibtex-to-markdown)
 
 [![Download from PyPI](https://img.shields.io/pypi/v/academic.svg?style=for-the-badge)](https://pypi.python.org/pypi/academic)
