@@ -92,12 +92,10 @@ def parse_bibtex_entry(
 
     # Prepare YAML front matter for Markdown file.
     if not dry_run:
-        from importlib import resources as impresources
+        from importlib import resources as import_resources
 
         # Load the Markdown template from within the `templates` folder of the `academic` package
-        inp_file = impresources.files(__package__ + ".templates") / "publication.md"
-        with inp_file.open("rt") as f:
-            template = f.read()
+        template = import_resources.read_text(__package__ + ".templates", "publication.md")
 
         with open(markdown_path, "w") as f:
             f.write(template)

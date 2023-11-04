@@ -7,6 +7,7 @@ import sys
 from argparse import RawTextHelpFormatter
 
 from academic.import_bibtex import import_bibtex
+from academic.import_notebook import import_notebook
 
 # Initialise logger.
 logging.basicConfig(
@@ -35,7 +36,7 @@ def parse_args(args):
 
     # Sub-parser for import command.
     parser_a = subparsers.add_parser("import", help="Import content into your website or book")
-    parser_a.add_argument("input", type=str, help="File path to your BibTeX file")
+    parser_a.add_argument("input", type=str, help="File path to your BibTeX or Jupyter Notebook file")
     parser_a.add_argument("output", type=str, help="Path to import publications to (e.g. `content/publication/`)")
     parser_a.add_argument("--featured", action="store_true", help="Flag publications as featured")
     parser_a.add_argument("--overwrite", action="store_true", help="Overwrite existing publications")
@@ -65,18 +66,26 @@ def parse_args(args):
         if known_args.command:
             if known_args.verbose:
                 # Set logging level to debug if verbose mode activated.
-                logging.getLogger().setLevel(logging.DEBUG)
-
-            # Run command to import bibtex.
-            import_bibtex(
-                known_args.input,
-                pub_dir=known_args.output,
-                featured=known_args.featured,
-                overwrite=known_args.overwrite,
-                normalize=known_args.normalize,
-                compact=known_args.compact,
-                dry_run=known_args.dry_run,
-            )
+                logging.getLogger().setLevel(logging.INFO)
+            if known_args.input.lower().endswith(".bib"):
+                # Run command to import bibtex.
+                import_bibtex(
+                    known_args.input,
+                    pub_dir=known_args.output,
+                    featured=known_args.featured,
+                    overwrite=known_args.overwrite,
+                    normalize=known_args.normalize,
+                    compact=known_args.compact,
+                    dry_run=known_args.dry_run,
+                )
+            elif known_args.input.lower().endswith(".ipynb"):
+                # Run command to import bibtex.
+                import_notebook(
+                    known_args.input,
+                    output_dir=known_args.output,
+                    overwrite=known_args.overwrite,
+                    dry_run=known_args.dry_run,
+                )
 
 
 if __name__ == "__main__":

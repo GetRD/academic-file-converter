@@ -9,7 +9,7 @@
 [![GitHub followers](https://img.shields.io/github/followers/gcushen?label=Follow%20on%20GH&style=for-the-badge)](https://github.com/gcushen)  
 
 
-### 📚 Easily import publications from your reference manager to your Markdown-formatted website or book
+### 📚 Easily import publications and Jupyter notebooks to your Markdown-formatted website or book
 
 ![](.github/media/demo.gif)
 
@@ -86,6 +86,18 @@ After importing publications, we suggest you:
   
 [Learn more in the Wowchemy Docs](https://university.wowchemy.com).
 
+### Import blog posts from Jupyter Notebooks
+
+Say we have our notebooks in a `notebooks` folder within the website folder, let's import them into the `content/post/` folder:
+
+    academic import 'notebooks/*.ipynb' content/post/ --verbose
+
+Optional arguments:
+
+* `--overwrite` Overwrite any existing blog posts in the output folder
+* `--verbose` or `-v` Show verbose messages
+* `--help` Help
+
 ## Contribute
 
 Interested in contributing to **open source** and **open science**?
@@ -99,7 +111,8 @@ For local development, clone this repository and use Poetry to install and run t
     git clone https://github.com/wowchemy/bibtex-to-markdown.git
     cd bibtex-to-markdown
     poetry install
-    poetry run academic import tests/data/article.bib output/ --overwrite --compact
+    poetry run academic import tests/data/article.bib output/publication/ --overwrite --compact
+    poetry run academic import 'tests/data/**/*.ipynb' output/post/ --overwrite --verbose
 
 When preparing a contribution, run the following checks and ensure that they all pass:
 

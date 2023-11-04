@@ -7,3 +7,9 @@ site/
 .idea/
 .tox/
 .cache/
+
+# Test data - temp files
+.ipynb_checkpoints
+
+# Trial runs
+output/
