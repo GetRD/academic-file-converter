@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "academic"
 description = "Import Bibtex publications and Jupyter Notebook blog posts into your Markdown-formatted website or book."
-version = "0.11.0"
+version = "0.11.1"
 authors = ["George Cushen"]
 readme = "README.md"
 homepage = "https://wowchemy.com"
@@ -20,6 +20,7 @@ python = ">=3.11.5"
 bibtexparser = "~1.4"
 "ruamel.yaml" = "~0.17"
 nbconvert = "^7.10.0"
+pyyaml = "^6.0.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
