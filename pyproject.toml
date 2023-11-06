@@ -1,15 +1,26 @@
+[build-system]
+# See https://python-poetry.org/docs/pyproject/#poetry-and-pep-517
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "academic"
 description = "Import Bibtex publications and Jupyter Notebook blog posts into your Markdown-formatted website or book."
 version = "0.11.1"
 authors = ["George Cushen"]
 readme = "README.md"
-homepage = "https://wowchemy.com"
-repository = "https://github.com/wowchemy/bibtex-to-markdown"
+homepage = "https://research.dev/"
+documentation = "https://university.research.dev/"
+repository = "https://github.com/GetRD/academic-file-converter"
 keywords = ["wowchemy", "bibtex", "markdown", "latex", "publication", "reference"]
 license = "MIT"
 packages = [
     { include = "academic" },
+]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Topic :: Internet :: WWW/HTTP :: Site Management",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
 [tool.poetry.scripts]
@@ -31,7 +42,12 @@ pyright = "^1.1.329"
 jupyter = "^1.0.0"
 
 [tool.black]
+target-version = ['py311', 'py312']
 line-length = 150  # Match Flake8 setting in `.flake8` file
 
 [tool.pyright]
 include = ["academic"]
+
+[tool.pytest.ini_options]
+# Ignore warning from Jupyter package: `DeprecationWarning: Jupyter is migrating its paths to use standard platformdirs`
+filterwarnings =['ignore::DeprecationWarning']
