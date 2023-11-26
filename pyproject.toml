@@ -6,13 +6,13 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 name = "academic"
 description = "Import Bibtex publications and Jupyter Notebook blog posts into your Markdown-formatted website or book."
-version = "0.11.1"
+version = "0.11.2"
 authors = ["George Cushen"]
 readme = "README.md"
 homepage = "https://research.dev/"
 documentation = "https://university.research.dev/"
 repository = "https://github.com/GetRD/academic-file-converter"
-keywords = ["wowchemy", "bibtex", "markdown", "latex", "publication", "reference"]
+keywords = ["research", "Jupyter", "bibtex", "markdown", "latex", "publication", "reference", "academic", "converter"]
 license = "MIT"
 packages = [
     { include = "academic" },

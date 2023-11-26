@@ -8,10 +8,10 @@ lint:
 	poetry run flake8
 
 test:
-	poetry run pytest
+	poetry run pytest -v
 
 type:
 	poetry run pyright
 
 publish:
-	poetry publish --build --dry-run
+	poetry publish --build

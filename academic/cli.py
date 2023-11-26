@@ -29,22 +29,22 @@ def parse_args(args):
     # Initialise command parser.
     version = importlib.metadata.version("academic")
     parser = argparse.ArgumentParser(
-        description=f"Academic CLI v{version}\nhttps://github.com/wowchemy/bibtex-to-markdown",
+        description=f"Academic CLI v{version}\nhttps://github.com/GetRD/academic-file-converter",
         formatter_class=RawTextHelpFormatter,
     )
     subparsers = parser.add_subparsers(help="Sub-commands", dest="command")
 
     # Sub-parser for import command.
     parser_a = subparsers.add_parser("import", help="Import content into your website or book")
-    parser_a.add_argument("input", type=str, help="File path to your BibTeX or Jupyter Notebook file")
-    parser_a.add_argument("output", type=str, help="Path to import publications to (e.g. `content/publication/`)")
+    parser_a.add_argument("input", type=str, help="File path to your BibTeX or Jupyter Notebook file(s)")
+    parser_a.add_argument("output", type=str, help="Output path (e.g. `content/publication/`)")
     parser_a.add_argument("--featured", action="store_true", help="Flag publications as featured")
-    parser_a.add_argument("--overwrite", action="store_true", help="Overwrite existing publications")
+    parser_a.add_argument("--overwrite", action="store_true", help="Overwrite existing files in output path")
     parser_a.add_argument("--compact", action="store_true", help="Generate minimal markdown")
     parser_a.add_argument(
         "--normalize",
         action="store_true",
-        help="Normalize each keyword to lowercase with uppercase first letter",
+        help="Normalize each BibTeX keyword to lowercase with uppercase first letter",
     )
     parser_a.add_argument("-v", "--verbose", action="store_true", required=False, help="Verbose mode")
     parser_a.add_argument(
@@ -52,7 +52,7 @@ def parse_args(args):
         "--dry-run",
         action="store_true",
         required=False,
-        help="Perform a dry run (Bibtex only)",
+        help="Perform a dry run (e.g. for testing purposes)",
     )
 
     known_args, unknown = parser.parse_known_args(args)

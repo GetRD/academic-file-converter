@@ -1,6 +1,6 @@
 [**中文**](./README.zh.md)
 
-# [Bibtex to Markdown Converter](https://github.com/wowchemy/bibtex-to-markdown)
+# [Academic File Converter](https://github.com/GetRD/academic-file-converter)
 
 [![Download from PyPI](https://img.shields.io/pypi/v/academic.svg?style=for-the-badge)](https://pypi.python.org/pypi/academic)
 [![Discord](https://img.shields.io/discord/722225264733716590?style=for-the-badge)](https://discord.com/channels/722225264733716590/742892432458252370/742895548159492138)
@@ -15,23 +15,28 @@
 
 **Features**
 
-* Import Bibtex publications (such as **books, conference proceedings and journals**) from your reference manager to your Markdown-formatted website or book
+* **Import Jupyter notebooks** as blog posts or book chapters
+* **Import publications** (such as **books, conference proceedings, and journals**) from your reference manager to your Markdown-formatted website or book
   * Simply export a BibTeX file from your reference manager, such as [Zotero](https://www.zotero.org), and provide this as the input to the converter tool
-* Compatible with all static website generators such as Next, Astro, Gatsby, Hugo, etc.
+* **Compatible with all static website generators** such as Next, Astro, Gatsby, Hugo, etc.
+* **Easy to use** - 100% Python, no dependency on complex software such as Pandoc
+* **Automate** file conversions using a [GitHub Action](https://github.com/HugoBlox/hugo-blox-builder/blob/main/starters/blog/.github/workflows/import-notebooks.yml)
 
 **Community**
 
-- 📚 [View the **documentation**](https://wowchemy.com/docs/content/publications/#import-from-bibtex) and usage guide below
-- 💬 [Chat with the **community**](https://discord.gg/z8wNYzb)
-- 🐦 Twitter: [@wowchemy](https://twitter.com/wowchemy) [@GeorgeCushen](https://twitter.com/GeorgeCushen) [#MadeWithAcademic](https://twitter.com/search?q=(%23MadeWithWowchemy%20OR%20%23MadeWithAcademic)&src=typed_query)
+- 📚 [View the **documentation** below](#installation)
+- 💬 [Chat live with the **community** on Discord](https://discord.gg/z8wNYzb)
+- 🐦 Twitter: [@GetResearchDev](https://twitter.com/GetResearchDev) [@GeorgeCushen](https://twitter.com/GeorgeCushen) [#MadeWithAcademic](https://twitter.com/search?q=%23MadeWithAcademic&src=typed_query)
 
-**❤️ Support this open-source software**
+## ❤️ Support Open Research & Open Source
 
-To help us develop this converter tool and the associated Wowchemy open source software sustainably under the MIT license, we ask all individuals and businesses that use it to help support its ongoing maintenance and development via sponsorship and contributing.
+We are on a mission to foster **open research** by developing **open source** tools like this.
 
-Support this open science movement:
+To help us develop this open source software sustainably under the MIT license, we ask all individuals and businesses that use it to help support its ongoing maintenance and development via sponsorship and contributing.
 
-  - ⭐️ [**Star** this project on GitHub](https://github.com/wowchemy/bibtex-to-markdown)
+Support the open research movement:
+
+  - ⭐️ [**Star** this project on GitHub](https://github.com/GetRD/academic-file-converter)
   - ❤️ [Become a **GitHub Sponsor** and **unlock perks**](https://github.com/sponsors/gcushen)
   - ☕️ [**Donate a coffee**](https://github.com/sponsors/gcushen?frequency=one-time)
   - 👩‍💻 [**Contribute**](#contribute)
@@ -56,13 +61,13 @@ Pipx will **automatically install the required Python version for you** in a ded
 
 ## Usage
 
-Download references from your reference manager, such as Zotero, in the Bibtex format.
+Open your Command Line or Terminal app and use the `cd` command to navigate to the folder containing the files you wish to convert, for example:
 
-Use the `cd` command to navigate to the folder containing your Bibtex file:
-
-    cd <MY_BIBTEX_FOLDER>
+    cd ~/Documents/my_website
 
 ### Import publications
+
+Download references from your reference manager, such as Zotero, in the Bibtex format.
 
 Say we downloaded our publications to a file named `my_publications.bib` within the website folder, let's import them into the `content/publication/` folder:
 
@@ -84,7 +89,7 @@ After importing publications, we suggest you:
 - Add an image named `featured` to each publication's folder to visually represent your publication on the page and for sharing on social media
 - Add the publication PDF to each publication folder (for open access publications), to enable your website visitors to download your publication
   
-[Learn more in the Wowchemy Docs](https://university.wowchemy.com).
+[Learn more in the Hugo Blox Docs](https://docs.hugoblox.com/reference/content-types/).
 
 ### Import blog posts from Jupyter Notebooks
 
@@ -100,16 +105,16 @@ Optional arguments:
 
 ## Contribute
 
-Interested in contributing to **open source** and **open science**?
+Interested in contributing to **open source** and **open research**?
 
 Learn [how to contribute code on Github](https://codeburst.io/a-step-by-step-guide-to-making-your-first-github-contribution-5302260a2940).
 
-Check out the [open issues](https://github.com/wowchemy/bibtex-to-markdown/issues) and contribute a [Pull Request](https://github.com/wowchemy/bibtex-to-markdown/pulls). 
+Check out the [open issues](https://github.com/GetRD/academic-file-converter/issues) and contribute a [Pull Request](https://github.com/GetRD/academic-file-converter/pulls). 
 
 For local development, clone this repository and use Poetry to install and run the converter using the following commands:
 
-    git clone https://github.com/wowchemy/bibtex-to-markdown.git
-    cd bibtex-to-markdown
+    git clone https://github.com/GetRD/academic-file-converter.git
+    cd academic-file-converter
     poetry install
     poetry run academic import tests/data/article.bib output/publication/ --overwrite --compact
     poetry run academic import 'tests/data/**/*.ipynb' output/post/ --overwrite --verbose
@@ -125,13 +130,13 @@ When preparing a contribution, run the following checks and ensure that they all
 
 You can help test the latest development version by installing the latest `main` branch from GitHub:
 
-    pip3 install -U git+https://github.com/wowchemy/bibtex-to-markdown.git
+    pip3 install -U git+https://github.com/GetRD/academic-file-converter.git
 
 ## License
 
 Copyright 2018-present [George Cushen](https://georgecushen.com).
 
-Licensed under the [MIT License](https://github.com/wowchemy/bibtex-to-markdown/blob/main/LICENSE.md).
+Licensed under the [MIT License](https://github.com/GetRD/academic-file-converter/blob/main/LICENSE.md).
 
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/academic?label=PyPi%20Downloads&style=for-the-badge)
-[![License](https://img.shields.io/pypi/l/academic.svg?style=for-the-badge)](https://github.com/wowchemy/bibtex-to-markdown/blob/main/LICENSE.md)
+[![License](https://img.shields.io/pypi/l/academic.svg?style=for-the-badge)](https://github.com/GetRD/academic-file-converter/blob/main/LICENSE.md)

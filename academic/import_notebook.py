@@ -13,7 +13,7 @@ from traitlets.config import Config
 from academic.jupyter_whitespace_remover import JupyterWhitespaceRemover
 
 
-def _get_slug(text: str):
+def _get_slug(text: str) -> str:
     return text.lower().replace(" ", "-")
 
 
@@ -26,11 +26,12 @@ def import_notebook(
     """Import blog posts from Jupyter Notebook files"""
     from academic.cli import log
 
+    log.info(f"Searching for Jupyter notebooks in `{input_path}`")
     for filename in glob.glob(input_path, recursive=True):
-        if not filename.endswith(".ipynb") or not os.path.basename(filename) != ".ipynb_checkpoints":
-            return
+        if not (filename.endswith(".ipynb") and os.path.basename(filename) != ".ipynb_checkpoints"):
+            continue
 
-        log.info(f"Found notebook {filename}")
+        log.debug(f"Found notebook `{filename}`")
 
         # Read Notebook
         nb = nbf.read(open(filename, "r"), as_version=4)
@@ -53,8 +54,10 @@ def _export(nb, exporter, output_dir, filename, extension, overwrite):
 
     # Do not overwrite blog post if it already exists
     if not overwrite and os.path.isdir(page_bundle_path):
-        log.info(f"Skipping creation of {page_bundle_path} as it already exists. " f"To overwrite, add the `--overwrite` argument.")
+        log.debug(f"Skipping creation of `{page_bundle_path}` as it already exists. To overwrite, add the `--overwrite` argument.")
         return
+
+    log.info(f"Importing notebook `{filename}`")
 
     # Create page bundle folder
     if not os.path.exists(page_bundle_path):
@@ -80,9 +83,12 @@ def _export(nb, exporter, output_dir, filename, extension, overwrite):
     search = re.search("^#{1}(.*)", body)
     if search:
         title = search.group(1).strip()
+        # Remove the h1 heading as static site generators expect the title to be defined via front matter instead.
         body = re.sub("^#{1}(.*)", "", body)
     else:
-        title = filename_base.replace("-", " ").title()
+        # Fallback to using filename as title
+        # Apply transformation as expect *nix-style file naming with hyphens/underscores separating words rather than spaces.
+        title = filename_base.replace("-", " ").replace("_", " ").title()
 
     # Initialise front matter variables
     date = datetime.now().strftime("%Y-%m-%d")
